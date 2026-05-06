@@ -205,10 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (splashIntro && splashVideo) {
-        splashVideo.muted = false; // Ensure video is unmuted
+        splashVideo.muted = true; // Ensure video is muted for reliable autoplay on mobile
         
-        splashVideo.muted = false; // Ensure video is unmuted
-        splashVideo.play().catch(e => console.log('Autoplay with sound prevented by browser:', e));
+        splashVideo.currentTime = 0; // Reset video to start
+        splashVideo.play().catch(e => console.log('Autoplay prevented by browser:', e));
         
         // Hide splash after 8 seconds maximum
         let splashTimeout = setTimeout(hideSplash, 8000);
