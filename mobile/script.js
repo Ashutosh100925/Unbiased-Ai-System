@@ -205,11 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (splashIntro && splashVideo) {
-        // Force play just in case autoplay is blocked initially
-        splashVideo.play().catch(e => console.log('Video autoplay blocked:', e));
+        splashVideo.muted = false; // Ensure video is unmuted
         
-        // Hide splash after 8 seconds maximum (to allow video fade in and full playback)
-        // or when the video ends, whichever happens first.
+        splashVideo.muted = false; // Ensure video is unmuted
+        splashVideo.play().catch(e => console.log('Autoplay with sound prevented by browser:', e));
+        
+        // Hide splash after 8 seconds maximum
         let splashTimeout = setTimeout(hideSplash, 8000);
 
         splashVideo.addEventListener('ended', () => {
