@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Color Grid Connect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="top-bar glass-panel">
+      <div class="stat-pill">
+        <span class="label">Level</span>
+        <strong id="levelValue">1</strong>
+      </div>
+      <div class="brand-mini">
+        <span class="dot cyan"></span>
+        <span class="dot pink"></span>
+        <span class="dot green"></span>
+        <h1>Color Grid Connect</h1>
+      </div>
+      <div class="stat-pill">
+        <span class="label">Moves</span>
+        <strong id="moveValue">0</strong>
+      </div>
+    </header>
+
+    <main class="game-area">
+      <section class="board-wrap glass-panel">
+        <div id="grid" class="grid" aria-label="Puzzle grid"></div>
+      </section>
+      <p class="progress-text" id="progressText">Fill every cell to win</p>
+    </main>
+
+    <footer class="controls">
+      <button id="levelsBtn" class="action-btn ghost-btn">Levels</button>
+      <button id="resetBtn" class="action-btn neon-btn">Reset</button>
+      <button id="helpBtn" class="action-btn ghost-btn tut-help-btn" aria-label="How to play">How To Play</button>
+    </footer>
+  </div>
+
+  <div id="levelsModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="levels-card glass-panel pop-in">
+      <div class="levels-head">
+        <h2>Select Pack</h2>
+        <button id="closeLevelsBtn" class="mini-close" aria-label="Close levels">✕</button>
+      </div>
+      <div id="levelsCarousel" class="levels-carousel" aria-label="Level packs"></div>
+      <div id="carouselDots" class="carousel-dots" aria-label="Carousel pagination"></div>
+    </div>
+  </div>
+
+  <div id="levelCompleteModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card glass-panel pop-in">
+      <h2>Level Complete!</h2>
+      <div class="stars">★ ★ ★</div>
+      <p>Moves Used: <strong id="finalMoves">0</strong></p>
+      <button id="nextLevelBtn" class="action-btn neon-btn wide">Next Level</button>
+    </div>
+  </div>
+
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content pop-in">
+      <img src="Cover.jpeg" alt="Color Grid Connect" class="splash-logo">
+      <h1 class="splash-title">Color Grid Connect</h1>
+      <button id="startGameBtn" class="action-btn neon-btn wide splash-play-btn">Play</button>
+    </div>
+  </div>
+
+  <div id="tutorialOverlay" class="tutorial-overlay hidden">
+    <div class="tutorial-backdrop"></div>
+
+    <div class="tutorial-ui">
+      <div class="tutorial-card glass-panel pop-in">
+        <h2 id="tutTitle">How to Play</h2>
+        <p id="tutDesc">Connect matching colors to fill the grid</p>
+        <div class="tut-progress">
+          <span id="tutStepIndicator">Step 1/5</span>
+          <div class="tut-dots" id="tutDots"></div>
+        </div>
+        <div class="tut-actions">
+          <button id="tutSkipBtn" class="ghost-btn action-btn small">Skip</button>
+          <button id="tutNextBtn" class="neon-btn action-btn small">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

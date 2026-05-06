@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "framework": "fastapi",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "api/index.py"
+    },
+    {
+      "source": "/firebase-config-js",
+      "destination": "api/index.py"
+    },
+    {
+      "source": "/health",
+      "destination": "api/index.py"
+    }
+  ],
+  "cleanUrls": true
+}

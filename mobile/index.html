@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Fair AI - Secure Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Same document stack as desktop analysis (PDF, Word, OCR) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+</head>
+
+<body class="dark-mode splash-active">
+    <!-- Splash Screen -->
+    <div id="splash-intro" class="splash-intro">
+        <video id="splash-video" class="splash-video" autoplay muted playsinline>
+            <source src="Mobile Intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="bg-decoration primary-decoration"></div>
+    <div class="bg-decoration secondary-decoration"></div>
+
+    <!-- Login View -->
+    <div id="login-view" class="view">
+        <header class="top-nav">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue" data-icon="shield">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="hero-section centered">
+                <h1 class="hero-title text-headline-lg">Secure, ethical, and explainable <br>AI platform</h1>
+
+            </section>
+
+            <div class="login-card premium-style">
+                <form class="login-form">
+                    <div class="input-group">
+                        <div class="input-wrapper premium-input">
+                            <span class="material-symbols-outlined input-icon">mail</span>
+                            <input id="email" type="email" placeholder="Email / Username" required />
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-wrapper premium-input">
+                            <span class="material-symbols-outlined input-icon">lock</span>
+                            <input id="password" type="password" placeholder="Password" required />
+                            <span class="material-symbols-outlined visibility-toggle">visibility</span>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" />
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn premium-btn" title="Sign in with Google">
+                        <span>Sign in with Google</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </form>
+
+                <div class="trust-badges">
+                    <div class="badge">
+                        <span class="material-symbols-outlined">lock</span>
+                        <span>256-bit</span>
+                    </div>
+
+
+                    <div class="badge-dot"></div>
+                    <div class="badge">
+                        <span class="material-symbols-outlined">database</span>
+                        <span>Secure Data</span>
+                    </div>
+                </div>
+
+                <div class="divider-container">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">or connect with</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <div class="social-row">
+                    <button type="button" id="google-signin-btn" class="social-btn outlined google-login-btn">
+                        <img src="../assets/Google.png" alt="Google" class="google-icon" />
+                        <span>Sign in with Google</span>
+                    </button>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p class="footer-text">
+                    Don't have an account? <a href="#" class="signup-link">Sign Up</a>
+                </p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Signup View -->
+    <div id="signup-view" class="view hidden">
+        <main class="main-content signup-container">
+            <header class="signup-header">
+                <h1 class="signup-title">Create Account</h1>
+                <p class="signup-subtitle">Join the ethical AI revolution and ensure fairness in every decision.</p>
+            </header>
+
+            <div class="signup-card">
+                <button type="button" class="google-signup-btn">
+                    <img src="../assets/Google.png" alt="Google" class="google-icon" />
+                    <span>Sign up with Google</span>
+                </button>
+
+                <div class="signup-divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">OR</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <form class="signup-form">
+                    <div class="signup-input-group">
+                        <label for="signup-name">Full Name</label>
+                        <div class="signup-input-wrapper">
+                            <input id="signup-name" type="text" placeholder="John Doe" required />
+                        </div>
+                    </div>
+
+                    <div class="signup-input-group">
+                        <label for="signup-email">Work Email</label>
+                        <div class="signup-input-wrapper">
+                            <input id="signup-email" type="email" placeholder="john@company.com" required />
+                        </div>
+                    </div>
+
+                    <div class="signup-input-group">
+                        <label for="signup-password">Password</label>
+                        <div class="signup-input-wrapper">
+                            <input id="signup-password" type="password" placeholder="********" required />
+                            <span class="material-symbols-outlined signup-visibility-toggle">visibility</span>
+                        </div>
+                    </div>
+
+                    <div class="signup-input-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <div class="signup-input-wrapper">
+                            <input id="signup-confirm-password" type="password" placeholder="********" required />
+                        </div>
+                    </div>
+
+                    <div class="signup-options">
+                        <label class="terms-checkbox">
+                            <input type="checkbox" required />
+                            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                                    Policy</a>.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="signup-submit-btn">
+                        <span>Create Account</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </form>
+
+                <div class="login-prompt">
+                    <p>Already have an account? <a href="#" class="login-link-back">Log In</a></p>
+                </div>
+            </div>
+
+            <div class="signup-trust-footer">
+                <p class="trust-title">TRUSTED BY ETHICAL ENTERPRISE LEADERS</p>
+                <div class="trust-badges-row">
+                    <div class="trust-badge">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>ISO 27001 SECURE</span>
+                    </div>
+                    <div class="trust-badge">
+                        <span class="material-symbols-outlined">verified_user</span>
+                        <span>GDPR COMPLIANT</span>
+                    </div>
+                </div>
+                <div class="trust-badge single-badge">
+                    <span class="material-symbols-outlined">lock</span>
+                    <span>AES-256 ENCRYPTED</span>
+                </div>
+                <p class="copyright-text">© 2024 Unbiased AI. Auditing fairness for a better future.</p>
+            </div>
+        </main>
+    </div>
+
+
+    <!-- Onboarding View -->
+    <div id="onboarding-view" class="view hidden">
+        <header class="top-nav shadow-none">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue" data-icon="shield">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <button id="skip-btn" class="skip-btn">Skip</button>
+            </div>
+        </header>
+
+        <main class="onboarding-content">
+            <div class="slides-container">
+                <!-- Slide 1: Detect Hidden Bias -->
+                <div class="slide active" id="slide-1">
+                    <div class="slide-image-container">
+                        <div class="illustration-lens">
+                            <div class="lens-circle circle-1"></div>
+                            <div class="lens-circle circle-2"></div>
+                            <div class="lens-circle circle-3"></div>
+                            <span class="material-symbols-outlined lens-icon">visibility</span>
+                        </div>
+                    </div>
+                    <div class="slide-text">
+                        <h2 class="text-headline-md text-on-background">Detect Hidden Bias</h2>
+                        <p class="text-body-md subtitle-text">Our futuristic AI lens scans your models to identify
+                            systemic patterns of prejudice and unfairness.</p>
+                    </div>
+                    <div class="slide-actions">
+                        <button class="submit-btn onboarding-btn next-action flex-1">
+                            <span>Next</span>
+                            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Explain Every Decision -->
+                <div class="slide" id="slide-2">
+                    <div class="slide-image-container">
+                        <div class="illustration-cards">
+                            <div class="mini-card">
+                                <span class="material-symbols-outlined icon-info">info</span>
+                                <div class="skeleton-line w-full"></div>
+                                <div class="skeleton-line w-3/4"></div>
+                            </div>
+                            <div class="mini-card">
+                                <span class="material-symbols-outlined icon-success">check_circle</span>
+                                <div class="skeleton-line w-full"></div>
+                                <div class="skeleton-line w-1/2"></div>
+                            </div>
+                            <div class="mini-card">
+                                <span class="material-symbols-outlined icon-warning">warning</span>
+                                <div class="skeleton-line w-3/4"></div>
+                                <div class="skeleton-line w-1/2"></div>
+                            </div>
+                            <div class="mini-card">
+                                <span class="material-symbols-outlined icon-primary">magic_button</span>
+                                <div class="skeleton-line w-full"></div>
+                                <div class="skeleton-line w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-text">
+                        <h2 class="text-headline-md text-on-background">Explain Every Decision</h2>
+                        <p class="text-body-md subtitle-text">Convert black-box algorithms into transparent pathways
+                            with intuitive explanation cards.</p>
+                    </div>
+                    <div class="slide-actions">
+                        <button class="submit-btn onboarding-btn outline-btn prev-action flex-1">
+                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                            <span>Back</span>
+                        </button>
+                        <button class="submit-btn onboarding-btn next-action flex-1">
+                            <span>Next</span>
+                            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Build Fair AI Systems -->
+                <div class="slide" id="slide-3">
+                    <div class="slide-image-container">
+                        <div class="illustration-report">
+                            <div class="report-header">
+                                <div class="report-icon-container">
+                                    <span class="material-symbols-outlined">shield</span>
+                                </div>
+                                <div class="report-title-area">
+                                    <h3>Audit Report</h3>
+                                    <span>v2.4 Finalized</span>
+                                </div>
+                            </div>
+                            <div class="report-score-area">
+                                <div class="score-labels">
+                                    <span>Parity Score</span>
+                                    <span class="score-value">98%</span>
+                                </div>
+                                <div class="score-bar-bg">
+                                    <div class="score-bar-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-text">
+                        <h2 class="text-headline-md text-on-background">Build Fair AI Systems</h2>
+                        <p class="text-body-md subtitle-text">Join a global community of ethical guardians setting the
+                            new standard for artificial intelligence.</p>
+                    </div>
+                    <div class="slide-actions">
+                        <button class="submit-btn onboarding-btn outline-btn prev-action flex-1">
+                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                            <span>Back</span>
+                        </button>
+                        <button id="start-btn" class="submit-btn onboarding-btn btn-green flex-2">
+                            <span>Start Analysis</span>
+                            <span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="onboarding-controls">
+                <div class="pagination-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Analysis View (Success/Get Started) -->
+    <div id="analysis-view" class="view hidden">
+        <div class="analysis-inner">
+            <div class="shield-container">
+                <span class="material-symbols-outlined shield-large">shield_with_heart</span>
+            </div>
+            <h1 class="analysis-title">Fair AI</h1>
+            <p class="analysis-subtitle">Ensuring fairness and transparency in automated decision systems.</p>
+            <button id="final-get-started-btn" class="submit-btn get-started-btn">Get Started</button>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <div id="mobile-auth-profile-root" class="mobile-auth-profile-root hidden" aria-live="polite"></div>
+                <div class="avatar-small profile-avatar-trigger">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=sarah" alt="User Avatar" />
+                    <div class="profile-popup hidden">
+                        <div class="popup-item profile-dashboard-btn"
+                            onclick="document.querySelector('.tab-profile').click()">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>Profile Dashboard</span>
+                        </div>
+                        <div class="popup-item credits-display-item">
+                            <span class="material-symbols-outlined">toll</span>
+                            <span data-fairai-user-credits>0 AI credits</span>
+                        </div>
+                        <div class="popup-item popup-logout-btn" onclick="handleLogout()">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Log Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <section class="welcome-section">
+                <h1 class="text-headline-md">Hello, <span id="mobile-welcome-name">there</span></h1>
+                <p class="text-body-md dashboard-subtitle">Your auditing dashboard is ready for today's fairness checks.
+                </p>
+            </section>
+
+            <div class="hero-3d" id="hero3d">
+                <div class="bg-grid"></div>
+                <div class="bg-vignette"></div>
+
+                <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+
+                <div class="center-zone" aria-label="FairAI core">
+                    <div class="orbit-ring ring-1"></div>
+                    <div class="orbit-ring ring-2"></div>
+                    <div class="orbit-ring ring-3"></div>
+
+                    <div class="chip-glow"></div>
+                    <div class="center-chip">
+                        <div class="chip-inner">
+                            <img src="../assets/Fair ai 3d.png" alt="FairAI center chip" loading="eager" />
+                        </div>
+                    </div>
+                </div>
+
+                <section class="orbit" id="orbit" aria-label="Orbiting AI system status cards">
+                    <article class="orbit-card card-1">
+                        <img src="../assets/Bias.png" alt="Bias Detection card" loading="lazy" />
+                    </article>
+                    <article class="orbit-card card-2">
+                        <img src="../assets/Fairness.png" alt="Fairness Score card" loading="lazy" />
+                    </article>
+                    <article class="orbit-card card-3">
+                        <img src="../assets/Explainability.png" alt="Explainability card" loading="lazy" />
+                    </article>
+                    <article class="orbit-card card-4">
+                        <img src="../assets/Confidence.png" alt="Confidence card" loading="lazy" />
+                    </article>
+                    <article class="orbit-card card-5">
+                        <img src="../assets/What if Analysis.png" alt="What-if Analysis card" loading="lazy" />
+                    </article>
+                    <article class="orbit-card card-6">
+                        <img src="../assets/False detection.png" alt="False Detection card" loading="lazy" />
+                    </article>
+                </section>
+            </div>
+
+            <section class="quick-audit-section">
+                <div class="section-header">
+                    <h2 class="text-title-md">Quick Audit</h2>
+                    <span class="material-symbols-outlined filter-icon">tune</span>
+                </div>
+                <div class="audit-list">
+                    <div class="audit-item"
+                        onclick="setMobileAuditDomain('hiring'); document.querySelector('.tab-analysis').click()">
+                        <div class="audit-icon-bg blue-bg">
+                            <span class="material-symbols-outlined">description</span>
+                        </div>
+                        <div class="audit-info">
+                            <h3>Resume Bias Check</h3>
+                            <p>Scan hiring algorithms for gender & racial parity.</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">chevron_right</span>
+                    </div>
+                    <div class="audit-item"
+                        onclick="setMobileAuditDomain('loan'); document.querySelector('.tab-analysis').click()">
+                        <div class="audit-icon-bg light-blue-bg">
+                            <span class="material-symbols-outlined">account_balance</span>
+                        </div>
+                        <div class="audit-info">
+                            <h3>Loan Fairness Check</h3>
+                            <p>Analyze credit scoring models for socioeconomic bias.</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">chevron_right</span>
+                    </div>
+                    <div class="audit-item"
+                        onclick="setMobileAuditDomain('admission'); document.querySelector('.tab-analysis').click()">
+                        <div class="audit-icon-bg indigo-bg">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div class="audit-info">
+                            <h3>Admission Fairness Check</h3>
+                            <p>Review institutional selection transparency.</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">chevron_right</span>
+                    </div>
+
+
+                </div>
+            </section>
+
+            <div class="featured-card">
+                <img src="https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop"
+                    alt="Abstract Background" class="featured-bg" />
+                <div class="featured-content">
+                    <h2>Review Framework</h2>
+                    <p>Check the latest ethical auditing standards.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Analysis View (Tab) -->
+    <div id="tab-analysis-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <div id="mobile-analysis-auth-chips-root" class="mobile-auth-profile-root hidden" aria-live="polite">
+                </div>
+                <div class="avatar-small profile-avatar-trigger">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=sarah" alt="User Avatar" />
+                    <div class="profile-popup hidden">
+                        <div class="popup-item profile-dashboard-btn"
+                            onclick="document.querySelector('.tab-profile').click()">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>Profile Dashboard</span>
+                        </div>
+                        <div class="popup-item credits-display-item">
+                            <span class="material-symbols-outlined">toll</span>
+                            <span data-fairai-user-credits>0 AI credits</span>
+                        </div>
+                        <div class="popup-item popup-logout-btn" onclick="handleLogout()">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Log Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="dashboard-content" style="gap: 20px;">
+
+            <div class="hero-section" style="padding: 0 4px;">
+                <h1 class="text-headline-md">Audit Framework</h1>
+                <p class="text-body-md" style="color: #64748b;">Define the parameters for your ethical AI audit session.
+                </p>
+            </div>
+
+            <!-- Audit Form Card -->
+            <div class="metric-card audit-form-card">
+                <div class="form-group">
+                    <label class="form-label">AUDIT DOMAIN</label>
+                    <div class="custom-dropdown" id="domain-dropdown">
+                        <div class="dropdown-trigger">
+                            <span class="selected-value">Hiring & Talent Acquisition</span>
+                            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
+                        </div>
+                        <div class="dropdown-options hidden">
+                            <div class="dropdown-option active" data-value="hiring">Hiring & Talent Acquisition</div>
+                            <div class="dropdown-option" data-value="loan">Loan Approval</div>
+                            <div class="dropdown-option" data-value="admission">College Admission</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">CANDIDATE ATTRIBUTES</label>
+                    <div class="input-with-icon active-border">
+                        <input type="text" id="audit-name" placeholder="Candidate Full Name" class="audit-input">
+                    </div>
+                    <div class="input-row" style="display: flex; gap: 12px; margin-top: 12px;">
+                        <div class="input-with-icon flex-1">
+                            <input type="text" id="audit-age" placeholder="Age" class="audit-input">
+                        </div>
+                        <div class="input-with-icon flex-1">
+                            <input type="text" id="audit-zip" placeholder="Zip Code" class="audit-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">REFERENCE DOCUMENTATION</label>
+                    <div class="drop-zone" id="audit-drop-zone">
+                        <input type="file" id="audit-file-input" class="hidden"
+                            accept=".csv,.json,.txt,.pdf,.doc,.docx,.png,.jpg,.jpeg" />
+                        <span class="material-symbols-outlined drop-icon">upload_file</span>
+                        <p class="drop-text">Upload resume, report, or data file</p>
+                        <span class="drop-subtext">PDF, Word, images (OCR), CSV, JSON, TXT — same extraction as
+                            desktop</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label class="form-label" style="margin-bottom: 0;">CONTEXTUAL DETAILS</label>
+                        <button type="button" id="voice-to-text-btn" class="voice-btn" title="Voice to Text">
+                            <span class="material-symbols-outlined">mic</span>
+                        </button>
+                    </div>
+                    <textarea id="audit-profile-text" class="audit-textarea"
+                        placeholder="Paste candidate profile summary or interview transcripts here..."></textarea>
+                </div>
+
+                <p id="audit-api-error" class="info-text-center hidden" style="color: #f87171; margin-top: 4px;"></p>
+
+                <button class="submit-btn btn-blue" id="analyze-bias-btn" style="margin-top: 8px;">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Analyze Bias</span>
+                </button>
+                <p class="info-text-center">Audits are performed against 14 global fairness parity metrics.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- History View (Tab) -->
+    <div id="tab-history-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <h1 class="text-headline-md">Audit History</h1>
+                <button class="clear-all-btn" onclick="clearMobHistory()">Clear All</button>
+            </div>
+        </header>
+        <div class="dashboard-content" id="history-root">
+            <div id="history-empty" class="metric-card centered" style="height: 200px;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #3b82f6;">history</span>
+                <p class="text-body-md" style="margin-top: 16px;">No recent audit logs found.</p>
+            </div>
+            <div id="history-list" class="history-entries hidden"></div>
+        </div>
+    </div>
+
+    <!-- Result View (Tab) -->
+    <div id="tab-result-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <div class="avatar-small profile-avatar-trigger">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=sarah" alt="User Avatar" />
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-content" style="gap: 16px;">
+            <!-- Overall Fairness Score Card -->
+            <div class="metric-card score-card">
+                <h3 class="card-title-center">Overall Fairness Score</h3>
+                <div class="circular-score-container">
+                    <div class="circular-score">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="bg" cx="50" cy="50" r="45"></circle>
+                            <circle id="mob-fairness-ring" class="fg" cx="50" cy="50" r="45"
+                                style="stroke-dasharray: 240, 283;"></circle>
+                        </svg>
+                        <div class="score-text">
+                            <span class="number" id="mob-fairness-pct">85%</span>
+                            <span class="label" id="mob-fairness-label">HIGH PARITY</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="recommendation-badge">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span id="mob-decision-rec">Decision Recommendation: Fair</span>
+                </div>
+            </div>
+
+            <!-- Desktop-parity: engine, final decision, confidence -->
+            <div class="metric-card mob-outcome-card">
+                <div class="mob-engine-badge-row">
+                    <span class="mob-engine-pill" id="mob-detected-type-label">—</span>
+                    <span class="mob-engine-conf" id="mob-detection-confidence">—</span>
+                </div>
+                <p class="mob-outcome-label">Final decision</p>
+                <p class="mob-final-decision" id="mob-final-decision">—</p>
+                <p class="mob-confidence-line">Confidence <span id="mob-confidence-score">—</span>% · Weighted score
+                    <span id="mob-weighted-score">—</span>/100
+                </p>
+            </div>
+
+            <!-- Risk and ID Row -->
+            <div class="results-row">
+                <div class="risk-card">
+                    <span class="risk-label">BIAS RISK</span>
+                    <span id="mob-risk-badge" class="risk-badge low">LOW</span>
+                </div>
+                <div class="audit-id-card">
+                    <span class="id-label">AUDIT ID</span>
+                    <span id="mob-audit-id" class="id-value">#UA-4921</span>
+                </div>
+            </div>
+
+            <!-- Factors Considered -->
+            <div class="metric-card factors-card">
+                <div class="card-header-simple">
+                    <span class="material-symbols-outlined icon-blue">account_tree</span>
+                    <h3>Factors Considered</h3>
+                </div>
+                <div id="mob-factors-grid" class="factors-grid">
+                    <span class="factor-pill">Education Level</span>
+                    <span class="factor-pill">Professional Experience</span>
+                    <span class="factor-pill">Technical Skillset</span>
+                    <span class="factor-pill">Certifications</span>
+                </div>
+            </div>
+
+            <!-- Key drivers (same bars as desktop) -->
+            <div class="metric-card mob-drivers-card">
+                <div class="card-header-simple">
+                    <span class="material-symbols-outlined icon-blue">trending_up</span>
+                    <h3>Key drivers</h3>
+                </div>
+                <div id="mob-key-drivers-container" class="mob-key-drivers"></div>
+            </div>
+
+            <!-- AI explanation -->
+            <div class="metric-card mob-explain-card">
+                <div class="card-header-simple">
+                    <span class="material-symbols-outlined icon-blue">psychology</span>
+                    <h3>AI explanation</h3>
+                </div>
+                <p id="mob-ai-explanation-text" class="mob-explain-quote">—</p>
+                <div class="mob-system-insight-block">
+                    <span class="mob-system-insight-label">System insight</span>
+                    <p id="mob-system-insight" class="mob-system-insight-body">—</p>
+                </div>
+            </div>
+
+            <!-- Bias breakdown (desktop parity) -->
+            <div class="metric-card mob-bias-breakdown-card">
+                <div class="card-header-simple text-red">
+                    <span class="material-symbols-outlined">equalizer</span>
+                    <h3>Bias breakdown</h3>
+                </div>
+                <div class="mob-bias-rows">
+                    <div class="mob-bias-row">
+                        <div class="mob-bias-row-head">
+                            <span>Gender bias</span>
+                            <span id="mob-gender-bias-percent">0%</span>
+                        </div>
+                        <div class="mob-bias-track">
+                            <div id="mob-gender-bias-bar" class="mob-bias-fill mob-bias-blue" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="mob-bias-row">
+                        <div class="mob-bias-row-head">
+                            <span>Age bias</span>
+                            <span id="mob-age-bias-percent">0%</span>
+                        </div>
+                        <div class="mob-bias-track">
+                            <div id="mob-age-bias-bar" class="mob-bias-fill mob-bias-purple" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="mob-bias-row">
+                        <div class="mob-bias-row-head">
+                            <span>Education bias</span>
+                            <span id="mob-education-bias-percent">0%</span>
+                        </div>
+                        <div class="mob-bias-track">
+                            <div id="mob-education-bias-bar" class="mob-bias-fill mob-bias-pink" style="width: 0%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sensitive Attributes -->
+            <div class="metric-card sensitive-card">
+                <div class="card-header-simple text-red">
+                    <span class="material-symbols-outlined">warning</span>
+                    <h3>Sensitive Attributes</h3>
+                </div>
+                <div id="mob-sensitive-list" class="attribute-list">
+                    <div class="attribute-item">
+                        <span>Gender</span>
+                        <span class="flagged-badge">FLAGGED</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span>Ethnicity</span>
+                        <span class="flagged-badge">FLAGGED</span>
+                    </div>
+                </div>
+                <p id="mob-sensitive-footer" class="attribute-footer">Detected in training data. Corrective parity
+                    applied.</p>
+            </div>
+
+            <!-- Parity Analysis -->
+            <div class="metric-card parity-analysis-card">
+                <div class="card-header-with-info">
+                    <h3>Parity Analysis</h3>
+                    <span class="material-symbols-outlined info-icon">info</span>
+                </div>
+                <div id="mob-parity-list" class="parity-list">
+                    <div class="parity-item">
+                        <div class="parity-header">
+                            <span>Demographic parity</span>
+                            <span class="parity-val val-green mob-parity-val-0">0.92</span>
+                        </div>
+                        <div class="parity-bar-bg">
+                            <div class="parity-bar bar-green mob-parity-bar-0" style="width: 92%;"></div>
+                        </div>
+                    </div>
+                    <div class="parity-item">
+                        <div class="parity-header">
+                            <span>Outcome consistency</span>
+                            <span class="parity-val val-green mob-parity-val-1">0.88</span>
+                        </div>
+                        <div class="parity-bar-bg">
+                            <div class="parity-bar bar-green mob-parity-bar-1" style="width: 88%;"></div>
+                        </div>
+                    </div>
+                    <div class="parity-item">
+                        <div class="parity-header">
+                            <span>Counterfactual stability</span>
+                            <span class="parity-val val-blue mob-parity-val-2">0.96</span>
+                        </div>
+                        <div class="parity-bar-bg">
+                            <div class="parity-bar bar-blue mob-parity-bar-2" style="width: 96%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Report Button -->
+            <button class="submit-btn btn-blue" id="generate-report-btn" style="margin-top: 8px;">
+                <span class="material-symbols-outlined">description</span>
+                <span>Generate Fair Report</span>
+            </button>
+        </main>
+    </div>
+
+    <!-- Report View (Tab) -->
+    <div id="tab-report-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <div class="avatar-small">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=sarah" alt="User Avatar" />
+                </div>
+            </div>
+        </header>
+
+        <main class="report-view-container">
+            <div class="report-intro">
+                <p class="report-id" id="mob-report-audit-id">AUDIT ID: #UA-92831</p>
+                <h1 class="report-title" id="mob-report-title">Fairness audit report</h1>
+                <p class="report-date" id="mob-report-date">Report generated on Oct 24, 2023</p>
+            </div>
+
+            <!-- Key Findings Card -->
+            <div class="findings-card">
+                <div class="findings-header">
+                    <h3>Key Findings</h3>
+                    <span id="mob-report-severity-badge" class="critical-badge">REVIEW</span>
+                </div>
+
+                <div class="parity-score-display">
+                    <div class="mini-circular">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#f1f5f9" stroke-width="8"></circle>
+                            <circle id="mob-report-ring" cx="50" cy="50" r="45" fill="none" stroke="#ef4444"
+                                stroke-width="8"
+                                style="stroke-dasharray: 183, 283; transform: rotate(-90deg); transform-origin: center;">
+                            </circle>
+                        </svg>
+                        <span id="mob-report-mini-score" class="score-num" style="color: #ef4444;">65</span>
+                    </div>
+                    <div class="score-details">
+                        <h4>Parity Score</h4>
+                        <p id="mob-report-parity-desc">Live result from FairAI engine.</p>
+                    </div>
+                </div>
+
+                <div class="sub-metrics-row">
+                    <div class="sub-metric-card">
+                        <span class="label">Confidence</span>
+                        <span id="mob-report-confidence" class="value">—</span>
+                    </div>
+                    <div class="sub-metric-card">
+                        <span class="label">Decision</span>
+                        <span id="mob-report-decision" class="value">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bias Breakdown -->
+            <div class="section-header-row">
+                <span class="material-symbols-outlined icon-blue">analytics</span>
+                <h3>Bias Breakdown</h3>
+            </div>
+            <div class="breakdown-card">
+                <p id="mob-breakdown-text" class="breakdown-text">
+                    Explanation from the backend will appear here after you run <strong>Analyze Bias</strong>.
+                </p>
+            </div>
+
+            <!-- Improvement Steps -->
+            <div class="section-header-row">
+                <span class="material-symbols-outlined" style="color: #10b981;">temp_preferences_custom</span>
+                <h3>Next steps</h3>
+            </div>
+            <div id="mob-improvement-list" class="improvement-list">
+                <div class="step-card">
+                    <span class="material-symbols-outlined step-icon">check_circle</span>
+                    <div class="step-info">
+                        <h4>Run analysis</h4>
+                        <p>Open the Analysis tab, enter a substantive profile for the chosen domain (hiring, loan, or
+                            admission), then review results.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Actions -->
+            <div class="report-actions">
+                <button type="button" class="btn-pdf" id="mob-btn-print-report">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Print / Save PDF</span>
+                </button>
+                <button type="button" class="btn-share" id="mob-btn-share-report">
+                    <span class="material-symbols-outlined">share</span>
+                    <span>Share summary</span>
+                </button>
+            </div>
+        </main>
+    </div>
+    <!-- Profile View -->
+    <div id="profile-view" class="view hidden">
+        <header class="dashboard-header">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+                <div class="avatar-small">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=alex" alt="User Avatar" />
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-content" style="padding-top: 16px;">
+            <!-- User Profile Card -->
+            <div class="profile-card">
+                <div class="profile-avatar-container">
+                    <img data-fairai-user-photo src="https://i.pravatar.cc/150?u=alex" alt="Profile"
+                        class="profile-avatar-large" />
+                    <div class="verified-badge">
+                        <span class="material-symbols-outlined">verified</span>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2 data-fairai-user-name>Alex Chen</h2>
+                    <p class="role-text">Lead Auditor &bull; ID: AI-9823</p>
+                    <div class="badge-container">
+                        <span class="access-badge pro">PRO ACCESS</span>
+                        <span class="access-badge ethical">ETHICAL GUIDE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription Section -->
+            <section class="settings-section">
+                <h3 class="section-title">SUBSCRIPTION & ACCESS</h3>
+                <div class="settings-list">
+
+                    <div class="settings-item" onclick="openGameOverlay()">
+                        <div class="settings-icon purple-vibrant-bg">
+                            <span class="material-symbols-outlined icon-white">sports_esports</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4>Earn AI credits</h4>
+                            <p>Play Color Grid Connect — same game as desktop (+5 credits per level).</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">chevron_right</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Preferences -->
+            <section class="settings-section">
+                <h3 class="section-title">SYSTEM PREFERENCES</h3>
+                <div class="settings-list">
+                    <div class="settings-item" id="setting-language">
+                        <div class="settings-icon blue-soft-bg">
+                            <span class="material-symbols-outlined icon-blue-dark">language</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4 id="language-display">Language</h4>
+                            <p id="language-value">English (US)</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">expand_more</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon blue-soft-bg">
+                            <span class="material-symbols-outlined icon-blue-dark">dark_mode</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4>Dark Mode</h4>
+                            <p>Automatic system sync</p>
+                        </div>
+                        <div class="toggle-switch active" id="toggle-dark-mode">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon blue-soft-bg">
+                            <span class="material-symbols-outlined icon-blue-dark">notifications</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4>Notifications</h4>
+                            <p>Critical audit alerts only</p>
+                        </div>
+                        <div class="toggle-switch" id="toggle-notifications">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Support Section -->
+            <section class="settings-section">
+                <h3 class="section-title">SUPPORT</h3>
+                <div class="settings-list">
+                    <div class="settings-item">
+                        <div class="settings-icon blue-soft-bg">
+                            <span class="material-symbols-outlined icon-blue-dark">help_center</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4>Help Center</h4>
+                            <p>Documentation & Guides</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">open_in_new</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon blue-soft-bg">
+                            <span class="material-symbols-outlined icon-blue-dark">policy</span>
+                        </div>
+                        <div class="settings-info">
+                            <h4>Privacy Policy</h4>
+                            <p>Data processing & ethics</p>
+                        </div>
+                        <span class="material-symbols-outlined chevron">chevron_right</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="handleLogout()">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Logout Session</span>
+            </button>
+        </main>
+
+    </div>
+
+    <div id="low-credits-overlay" class="mob-lc-overlay" onclick="closeLowCreditsModal()"></div>
+    <div id="low-credits-modal" class="mob-lc-modal">
+        <div class="mob-lc-icon-wrap">
+            <span class="material-symbols-outlined mob-lc-icon">warning</span>
+        </div>
+        <h3 class="mob-lc-title">Low credits</h3>
+        <p class="mob-lc-text">Play the mini-game to earn more credits and keep auditing.</p>
+        <div class="mob-lc-actions">
+            <button type="button" class="mob-lc-btn mob-lc-btn-secondary"
+                onclick="closeLowCreditsModal()">Cancel</button>
+            <button type="button" class="mob-lc-btn mob-lc-btn-primary" onclick="openGameOverlay()">Play game</button>
+        </div>
+    </div>
+
+    <div id="game-overlay-bg" class="mob-game-bg" onclick="closeGameOverlay()"></div>
+    <div id="game-overlay" class="mob-game-panel">
+        <div class="mob-game-toolbar">
+            <div class="mob-game-title">
+                <span class="material-symbols-outlined mob-game-title-icon">sports_esports</span>
+                Color Grid Connect
+            </div>
+            <button type="button" class="mob-game-close" onclick="closeGameOverlay()" aria-label="Close game">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <iframe id="game-iframe" class="mob-game-iframe" title="FairAI mini-game" src=""></iframe>
+    </div>
+
+    <nav class="bottom-nav hidden">
+        <div class="nav-item active tab-home">
+            <span class="material-symbols-outlined">home</span>
+            <span>Home</span>
+        </div>
+        <div class="nav-item tab-analysis">
+            <span class="material-symbols-outlined">analytics</span>
+            <span>Analysis</span>
+        </div>
+        <div class="nav-item tab-history">
+            <span class="material-symbols-outlined">history</span>
+            <span>History</span>
+        </div>
+        <div class="nav-item tab-profile">
+            <span class="material-symbols-outlined">person</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <!-- Confirm Clear History Modal -->
+    <div id="confirm-clear-modal" class="modal-overlay">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <span class="material-symbols-outlined icon-red">delete_forever</span>
+                <h2 class="text-headline-md" style="margin: 0;">Clear History?</h2>
+            </div>
+            <div class="modal-body">
+                <p class="text-body-md">Are you sure you want to clear all audit history? This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeClearHistoryModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="executeClearHistory()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Empty Modal -->
+    <div id="history-empty-modal" class="modal-overlay">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <span class="material-symbols-outlined icon-blue" style="font-size: 56px;">history_toggle_off</span>
+                <h2 class="text-headline-md" style="margin: 0;">Nothing to Clear</h2>
+            </div>
+            <div class="modal-body">
+                <p class="text-body-md">Your history is already empty. Please make some analysis to see them here!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeHistoryEmptyModal()">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script type="module" src="../backend/firebase.js"></script>
+    <script type="module" src="../backend/auth.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

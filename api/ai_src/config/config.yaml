@@ -1,0 +1,25 @@
+# Model Hyperparameters and Global Configurations
+hiring_model:
+  target_column: 'hired'
+  categorical_features: ['education_level', 'gender', 'city_tier']
+  numerical_features: ['years_experience', 'technical_score', 'communication_score']
+  sensitive_features: ['gender', 'city_tier']
+  max_iterations: 1000
+
+loan_model:
+  target_column: 'loan_approved'
+  categorical_features: ['employment_type', 'gender', 'marital_status']
+  numerical_features: ['annual_income', 'credit_score', 'debt_to_income', 'loan_amount']
+  sensitive_features: ['gender', 'marital_status']
+  max_iterations: 1000
+
+admission_model:
+  target_column: 'admitted'
+  categorical_features: ['school_type', 'caste_category', 'gender']
+  numerical_features: ['gpa', 'sat_score', 'extracurricular_score']
+  sensitive_features: ['caste_category', 'gender']
+  max_iterations: 1000
+
+fairness:
+  disparate_impact_threshold: 0.8  # The 80% rule
+  demographic_parity_threshold: 0.1 # Max difference in selection rates allowed
