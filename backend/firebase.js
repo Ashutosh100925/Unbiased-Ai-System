@@ -17,9 +17,10 @@ async function initFirebase() {
     const response = await fetch(apiBase + "/api/firebase-config");
     config = await response.json();
 
-    // If the backend returns null for apiKey, it means environment variables aren't set in Vercel
-    // We will automatically fallback to the hardcoded key so it just works for the hackathon
+    // If the backend returns null for apiKey, it means environment variables aren't set
+    if (!config.apiKey || config.apiKey === "null" || config.apiKey === "None") {
       config.apiKey = "MISSING_API_KEY";
+    }
 
 
     // Provide safe fallbacks for non-sensitive configuration if the user forgot to add them to Vercel
