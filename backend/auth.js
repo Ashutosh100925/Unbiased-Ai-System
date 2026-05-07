@@ -309,7 +309,10 @@ window.handleGoogleSignIn = async () => {
 
     if (!auth) {
         if (config && config.apiKey === "MISSING_API_KEY") {
-            alert("Configuration Error: Firebase API Key is missing. Ensure the backend is running and providing the configuration.");
+            const msg = (config.missing && config.missing.length > 0) 
+                ? `Missing: ${config.missing.join(", ")}` 
+                : "Firebase API Key is missing";
+            alert(`Configuration Error: ${msg}. Ensure Vercel Environment Variables are set and redeployed.`);
         } else {
             alert("Firebase initialization failed. Please try again.");
         }

@@ -18,8 +18,14 @@ async function initFirebase() {
     config = await response.json();
 
     // If the backend returns null for apiKey, it means environment variables aren't set
-    if (!config.apiKey || config.apiKey === "null" || config.apiKey === "None") {
+    if (!config.apiKey || config.apiKey === "null" || config.apiKey === "None" || config.apiKey === "MISSING_API_KEY") {
+      const missing = [];
+      if (!config.apiKey || config.apiKey === "null" || config.apiKey === "None") missing.push("API_KEY");
+      if (!config.authDomain || config.authDomain === "null") missing.push("AUTH_DOMAIN");
+      
+      console.error("Firebase Config is missing keys:", missing);
       config.apiKey = "MISSING_API_KEY";
+      config.missing = missing;
     }
 
 
