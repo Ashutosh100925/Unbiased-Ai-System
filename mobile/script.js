@@ -1,6 +1,10 @@
 import { firebaseInitPromise, auth } from "../backend/firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+function escapeHtml(t) {
+    return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
 /** Same-origin API with localhost fallback when the UI is opened from Live Server etc. */
 function getFairAiApiOrigin() {
     if (typeof location === "undefined") return "";
@@ -119,52 +123,81 @@ async function fairAiMobileSignOut() {
 
 function updateMobileUI(user) {
     const loginView = document.getElementById('login-view');
+    const signupView = document.getElementById('signup-view');
     const onboardingView = document.getElementById('onboarding-view');
     const dashboardView = document.getElementById('dashboard-view');
     const bottomNav = document.querySelector('.bottom-nav');
-    const signupView = document.getElementById('signup-view');
+    
+    // All possible content views that could overlap
+    const contentViews = [
+        loginView, signupView, onboardingView, dashboardView,
+        document.getElementById('tab-analysis-view'),
+        document.getElementById('tab-history-view'),
+        document.getElementById('tab-result-view'),
+        document.getElementById('tab-report-view'),
+        document.getElementById('profile-view')
+    ];
+
+    // 1. Hide everything first for a clean slate
+    contentViews.forEach(v => {
+        if (v) v.classList.add('hidden');
+    });
+    if (bottomNav) bottomNav.classList.add('hidden');
 
     if (user) {
-        if (loginView) loginView.classList.add('hidden');
-        if (signupView) signupView.classList.add('hidden');
+        // User is signed in
+        const onboarded = false; // Force onboarding check or status
 
-        const onboarded = false; // Always show onboarding flow when signed in
-        const allTabs = ["tab-analysis-view", "tab-history-view", "tab-result-view", "tab-report-view", "profile-view"].map(id => document.getElementById(id));
-
-        if (onboarded) {
-            if (onboardingView) onboardingView.classList.add('hidden');
-            if (dashboardView) dashboardView.classList.remove('hidden');
-            if (bottomNav) bottomNav.classList.remove('hidden');
-        } else if (onboardingView) {
-            onboardingView.classList.remove('hidden');
-            if (dashboardView) dashboardView.classList.add('hidden');
-            if (bottomNav) bottomNav.classList.add('hidden');
-            allTabs.forEach(t => t?.classList.add('hidden'));
-
-            // Force onboarding to start from the beginning
+        if (!onboarded) {
+            if (onboardingView) onboardingView.classList.remove('hidden');
             if (typeof window.resetMobileOnboarding === 'function') {
                 window.resetMobileOnboarding();
             }
+        } else {
+            if (dashboardView) dashboardView.classList.remove('hidden');
+            if (bottomNav) bottomNav.classList.remove('hidden');
         }
 
-        // Update user info
+        // Update user info across UI
         document.querySelectorAll("[data-fairai-user-name]").forEach(el => {
             el.textContent = user.displayName || "Account";
         });
         document.querySelectorAll("[data-fairai-user-photo]").forEach(img => {
-            img.src = user.photoURL || "https://via.placeholder.com/100";
+            img.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
         });
+        
         if (typeof window.updateCreditsUI === 'function') {
             window.updateCreditsUI();
         }
     } else {
+        // User is signed out - Show Login
         if (loginView) loginView.classList.remove('hidden');
-        if (signupView) signupView.classList.add('hidden');
-        [onboardingView, dashboardView, bottomNav].forEach(v => {
-            if (v) v.classList.add('hidden');
-        });
+        window.scrollTo(0, 0);
     }
 }
+
+function showMobToast(message, isError = false) {
+    const toast = document.getElementById('mob-toast');
+    if (!toast) return;
+    const icon = toast.querySelector('.toast-icon');
+    const text = toast.querySelector('.toast-message');
+    
+    text.textContent = message;
+    if (isError) {
+        icon.textContent = 'error';
+        icon.classList.add('error');
+    } else {
+        icon.textContent = 'check_circle';
+        icon.classList.remove('error');
+    }
+    
+    toast.classList.add('active');
+    setTimeout(() => {
+        toast.classList.remove('active');
+    }, 3000);
+}
+
+
 
 // Initialize Auth Listener
 firebaseInitPromise.then((fb) => {
@@ -220,8 +253,210 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loginForm = document.querySelector('.login-form');
+    const signupForm = document.querySelector('.signup-form');
     const loginView = document.getElementById('login-view');
+    const signupView = document.getElementById('signup-view');
     const onboardingView = document.getElementById('onboarding-view');
+    const dashboardView = document.getElementById('dashboard-view');
+    const bottomNav = document.querySelector('.bottom-nav');
+
+
+
+    // Setup navigation between login and signup
+    const signupLinks = document.querySelectorAll('.signup-link');
+    signupLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (loginView) loginView.classList.add('hidden');
+            if (signupView) signupView.classList.remove('hidden');
+            if (bottomNav) bottomNav.classList.add('hidden');
+            window.scrollTo(0, 0);
+        });
+    });
+
+    const loginLinksBack = document.querySelectorAll('.login-link-back');
+    loginLinksBack.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (signupView) signupView.classList.add('hidden');
+            if (loginView) loginView.classList.remove('hidden');
+            if (bottomNav) bottomNav.classList.add('hidden');
+            window.scrollTo(0, 0);
+        });
+    });
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = loginForm.querySelector('button[type="submit"]');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (btn) btn.classList.add('loading');
+            try {
+                if (typeof window.handleEmailSignIn === 'function') {
+                    const userCredential = await window.handleEmailSignIn(email, password);
+
+                    showMobToast("Signed in successfully!");
+                }
+            } catch (err) {
+                showMobToast(err.message || "Login failed", true);
+            } finally {
+                if (btn) btn.classList.remove('loading');
+            }
+        });
+    }
+
+    // OTP Logic Helpers
+    async function generateAndSendOTP(email) {
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        window.__fairAiMobGeneratedOtp = otp;
+        
+        try {
+            const origin = getFairAiApiOrigin();
+            console.log(`DEBUG: Sending OTP to ${origin}/api/send-otp for email ${email}`);
+            const response = await fetch(`${origin}/api/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp })
+            });
+            console.log("DEBUG: Response status:", response.status);
+            const data = await response.json();
+            console.log("DEBUG: Response data:", data);
+            
+            if (data.success) {
+                showMobToast(data.mock ? "Code sent (Check backend logs)" : `Verification code sent to ${email}`);
+                console.log("OTP for debug:", otp);
+            } else {
+                throw new Error(data.error || "Failed to send email");
+            }
+        } catch (err) {
+            console.error("Email Error:", err);
+            showMobToast("Failed to send verification email. Please try again.", true);
+            // In a hackathon, we might still want to proceed for demo if the email fails
+            console.log("FALLBACK OTP FOR DEMO:", otp);
+        }
+        return otp;
+    }
+
+    const otpView = document.getElementById('otp-view');
+    const otpDigits = document.querySelectorAll('.otp-digit');
+    const verifyOtpBtn = document.getElementById('verify-otp-btn');
+    const resendOtpBtn = document.getElementById('resend-otp-btn');
+    const backToSignupLink = document.querySelector('.back-to-signup-link');
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = signupForm.querySelector('button[type="submit"]');
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+            if (password !== confirmPassword) {
+                showMobToast("Passwords do not match", true);
+                return;
+            }
+
+            if (btn) btn.classList.add('loading');
+            try {
+                // Save pending data
+                window.__fairAiMobPendingSignup = { name, email, password };
+                
+                // Send OTP via Backend
+                await generateAndSendOTP(email);
+                
+                // Switch to OTP View
+                if (signupView) signupView.classList.add('hidden');
+                if (otpView) otpView.classList.remove('hidden');
+            } finally {
+                if (btn) btn.classList.remove('loading');
+            }
+        });
+    }
+
+    // Handle OTP digits input focus
+    otpDigits.forEach((digit, idx) => {
+        digit.addEventListener('input', (e) => {
+            if (e.target.value.length === 1 && idx < otpDigits.length - 1) {
+                otpDigits[idx + 1].focus();
+            }
+        });
+
+        digit.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                otpDigits[idx - 1].focus();
+            }
+            // Trigger verification on Enter
+            if (e.key === 'Enter') {
+                const enteredOtp = Array.from(otpDigits).map(d => d.value).join('');
+                if (enteredOtp.length === 6 && verifyOtpBtn) {
+                    verifyOtpBtn.click();
+                }
+            }
+        });
+    });
+
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', async () => {
+            const enteredOtp = Array.from(otpDigits).map(d => d.value).join('');
+            
+            if (enteredOtp.length !== 6) {
+                showMobToast("Please enter the 6-digit code", true);
+                return;
+            }
+
+            if (enteredOtp === window.__fairAiMobGeneratedOtp) {
+                verifyOtpBtn.classList.add('loading');
+                try {
+                    const { name, email, password } = window.__fairAiMobPendingSignup;
+                    if (typeof window.handleEmailSignUp === 'function') {
+                        await window.handleEmailSignUp(name, email, password);
+                        
+                        // Send Welcome Email
+                        try {
+                            const origin = getFairAiApiOrigin();
+                            await fetch(`${origin}/api/send-welcome`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email, name })
+                            });
+                        } catch (err) {
+                            console.error("Welcome email failed:", err);
+                        }
+
+                        showMobToast("Account verified and created!");
+                        if (otpView) otpView.classList.add('hidden');
+                        // Auth listener in updateMobileUI will handle the rest
+                    }
+                } catch (err) {
+                    showMobToast(err.message || "Verification failed", true);
+                } finally {
+                    verifyOtpBtn.classList.remove('loading');
+                }
+            } else {
+                showMobToast("Invalid verification code", true);
+                otpDigits.forEach(d => d.value = '');
+                otpDigits[0].focus();
+            }
+        });
+    }
+
+    if (resendOtpBtn) {
+        resendOtpBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await generateAndSendOTP(window.__fairAiMobPendingSignup.email);
+        });
+    }
+
+    if (backToSignupLink) {
+        backToSignupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (otpView) otpView.classList.add('hidden');
+            if (signupView) signupView.classList.remove('hidden');
+        });
+    }
 
     // Onboarding elements
     const slides = document.querySelectorAll('.slide');
@@ -300,18 +535,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const bottomNav = document.querySelector('.bottom-nav');
     const finalGetStartedBtn = document.getElementById('final-get-started-btn');
 
     if (finalGetStartedBtn) {
         finalGetStartedBtn.addEventListener('click', () => {
             markMobileOnboardedComplete();
             const analysisView = document.getElementById('analysis-view');
-            const dashboardView = document.getElementById('dashboard-view');
-            analysisView.classList.add('hidden');
-            dashboardView.classList.remove('hidden');
+            if (analysisView) analysisView.classList.add('hidden');
+            if (dashboardView) dashboardView.classList.remove('hidden');
             if (bottomNav) bottomNav.classList.remove('hidden');
-            void dashboardView.offsetWidth;
         });
     }
 
@@ -327,13 +559,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tab Navigation Logic
     const navItems = document.querySelectorAll('.nav-item');
-    const dashboardViewNode = document.getElementById('dashboard-view');
     const profileView = document.getElementById('profile-view');
     const analysisTabView = document.getElementById('tab-analysis-view');
     const historyTabView = document.getElementById('tab-history-view');
     const resultTabView = document.getElementById('tab-result-view');
     const reportTabView = document.getElementById('tab-report-view');
-    const allViews = [dashboardViewNode, profileView, analysisTabView, historyTabView, resultTabView, reportTabView];
+    const allViews = [dashboardView, profileView, analysisTabView, historyTabView, resultTabView, reportTabView];
 
     function switchTabView(targetView, clickedItem) {
         allViews.forEach(v => {
@@ -352,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.querySelectorAll('.tab-home').forEach(btn => {
-        btn.addEventListener('click', () => switchTabView(dashboardViewNode, btn));
+        btn.addEventListener('click', () => switchTabView(dashboardView, btn));
     });
     document.querySelectorAll('.tab-analysis').forEach(btn => {
         btn.addEventListener('click', () => switchTabView(analysisTabView, btn));
@@ -369,9 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.__fairAiMobLastAnalysis = window.__fairAiMobLastAnalysis || null;
 
-    function escapeHtml(t) {
-        return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-    }
+
 
     const analyzeBiasBtn = document.getElementById('analyze-bias-btn');
     const auditErr = document.getElementById('audit-api-error');
@@ -663,30 +892,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderHistoryUI() {
-        const hist = loadMobHistory();
-        const empty = document.getElementById('history-empty');
-        const listEl = document.getElementById('history-list');
-        if (!empty || !listEl) return;
-        if (!hist.length) {
-            empty.classList.remove('hidden');
-            listEl.classList.add('hidden');
-            return;
-        }
-        empty.classList.add('hidden');
-        listEl.classList.remove('hidden');
-        listEl.innerHTML = hist.map((row) => {
-            const dt = row.at ? new Date(row.at).toLocaleString() : '';
-            return `<div class="history-entry-card">
-                <div class="history-entry-meta">${escapeHtml(dt)} · ${escapeHtml(domainLabel(row.model_type))}</div>
-                <div class="history-entry-title">${escapeHtml(row.decision)}</div>
-                <div class="history-entry-sub">Fairness ${row.fairness_pct}% · ${escapeHtml(row.risk)} · ${escapeHtml(row.audit_id)}</div>
-            </div>`;
-        }).join('');
-    }
-    window.renderHistoryUI = renderHistoryUI;
 
-    renderHistoryUI();
+
+function renderHistoryUI() {
+    const hist = loadMobHistory();
+    const empty = document.getElementById('history-empty');
+    const listEl = document.getElementById('history-list');
+    if (!empty || !listEl) return;
+    if (!hist.length) {
+        empty.classList.remove('hidden');
+        listEl.classList.add('hidden');
+        return;
+    }
+    empty.classList.add('hidden');
+    listEl.classList.remove('hidden');
+    listEl.innerHTML = hist.map((row) => {
+        const dt = row.at ? new Date(row.at).toLocaleString() : '';
+        return `<div class="history-entry-card">
+            <div class="history-entry-meta">${escapeHtml(dt)} · ${escapeHtml(domainLabel(row.model_type))}</div>
+            <div class="history-entry-title">${escapeHtml(row.decision)}</div>
+            <div class="history-entry-sub">Fairness ${row.fairness_pct}% · ${escapeHtml(row.risk)} · ${escapeHtml(row.audit_id)}</div>
+        </div>`;
+    }).join('');
+}
+window.renderHistoryUI = renderHistoryUI;
+
+// Call initial render if storage already has data
+renderHistoryUI();
 
     if (analyzeBiasBtn) {
         async function runMobileBiasAnalysis() {
@@ -1146,31 +1378,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Signup View Switching ---
-    const signupLink = document.querySelector('.signup-link');
-    const loginLinkBack = document.querySelector('.login-link-back');
-    const signupView = document.getElementById('signup-view');
-
-    if (signupLink && loginView && signupView) {
-        signupLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginView.classList.add('hidden');
-            signupView.classList.remove('hidden');
-            if (bottomNav) bottomNav.classList.add('hidden');
-            window.scrollTo(0, 0);
-        });
-    }
-
-    if (loginLinkBack && loginView && signupView) {
-        loginLinkBack.addEventListener('click', (e) => {
-            e.preventDefault();
-            signupView.classList.add('hidden');
-            loginView.classList.remove('hidden');
-            if (bottomNav) bottomNav.classList.add('hidden');
-            window.scrollTo(0, 0);
-        });
-    }
-
     // Signup Password Toggle
     const signupPassInput = document.getElementById('signup-password');
     const signupToggle = document.querySelector('.signup-visibility-toggle');
@@ -1185,6 +1392,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', () => {
         document.querySelectorAll('.profile-popup').forEach(p => p.classList.add('hidden'));
     });
+
+    // End of DOMContentLoaded
 });
 
 // 3D Orbit Hero Logic

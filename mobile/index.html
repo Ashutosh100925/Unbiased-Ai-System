@@ -46,6 +46,8 @@
 
             </section>
 
+
+
             <div class="login-card premium-style">
                 <form class="login-form">
                     <div class="input-group">
@@ -71,8 +73,8 @@
                         <a href="#" class="forgot-link">Forgot Password?</a>
                     </div>
 
-                    <button type="submit" class="submit-btn premium-btn" title="Sign in with Google">
-                        <span>Sign in with Google</span>
+                    <button type="submit" class="submit-btn premium-btn">
+                        <span>Sign In</span>
                         <span class="material-symbols-outlined">arrow_forward</span>
                     </button>
                 </form>
@@ -199,6 +201,44 @@
                     <span>AES-256 ENCRYPTED</span>
                 </div>
                 <p class="copyright-text">© 2024 Unbiased AI. Auditing fairness for a better future.</p>
+            </div>
+        </main>
+    </div>
+    
+    <!-- OTP Verification View -->
+    <div id="otp-view" class="view hidden">
+        <header class="top-nav shadow-none">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined icon-blue">shield</span>
+                    <span class="logo-text">Fair AI</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="otp-content">
+            <div class="otp-card glass-card">
+                <div class="otp-icon-header">
+                    <span class="material-symbols-outlined">mark_email_unread</span>
+                </div>
+                <h2 class="text-headline-md">Verify your account</h2>
+                <p class="text-body-md subtitle">We've sent a 6-digit verification code to your email. Enter it below to continue.</p>
+                
+                <div class="otp-input-container">
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                    <input type="text" maxlength="1" class="otp-digit" pattern="\d*" />
+                </div>
+
+                <button id="verify-otp-btn" class="submit-btn premium-btn">Verify Account</button>
+                
+                <div class="otp-footer">
+                    <p>Didn't receive the code? <a href="#" id="resend-otp-btn">Resend</a></p>
+                    <a href="#" class="back-to-signup-link">Back to Signup</a>
+                </div>
             </div>
         </main>
     </div>
@@ -358,7 +398,7 @@
                 </div>
                 <div id="mobile-auth-profile-root" class="mobile-auth-profile-root hidden" aria-live="polite"></div>
                 <div class="avatar-small profile-avatar-trigger">
-                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=sarah" alt="User Avatar" />
+                    <img data-fairai-user-photo src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
                     <div class="profile-popup hidden">
                         <div class="popup-item profile-dashboard-btn"
                             onclick="document.querySelector('.tab-profile').click()">
@@ -911,7 +951,7 @@
                     <span class="logo-text">Fair AI</span>
                 </div>
                 <div class="avatar-small">
-                    <img data-fairai-user-photo src="https://i.pravatar.cc/100?u=alex" alt="User Avatar" />
+                    <img data-fairai-user-photo src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
                 </div>
             </div>
         </header>
@@ -920,8 +960,8 @@
             <!-- User Profile Card -->
             <div class="profile-card">
                 <div class="profile-avatar-container">
-                    <img data-fairai-user-photo src="https://i.pravatar.cc/150?u=alex" alt="Profile"
-                        class="profile-avatar-large" />
+                    <img data-fairai-user-photo src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile"
+                        class="profile-avatar-large" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
                     <div class="verified-badge">
                         <span class="material-symbols-outlined">verified</span>
                     </div>
@@ -1110,6 +1150,9 @@
                 <button class="btn btn-primary" onclick="closeHistoryEmptyModal()">Got it</button>
             </div>
         </div>
+    <div id="mob-toast" class="mob-toast">
+        <span class="material-symbols-outlined toast-icon">check_circle</span>
+        <span class="toast-message">Success!</span>
     </div>
 
     <script src="../script.js"></script>

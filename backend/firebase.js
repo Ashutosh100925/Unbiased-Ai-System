@@ -19,24 +19,22 @@ async function initFirebase() {
 
     // If the backend returns null for apiKey, it means environment variables aren't set in Vercel
     // We will automatically fallback to the hardcoded key so it just works for the hackathon
-    if (!config.apiKey || config.apiKey === "null" || config.apiKey === "MISSING_API_KEY") {
-      console.warn("Vercel env vars are missing. Falling back to hardcoded key.");
-      config.apiKey = "AIzaSyBlF9F4XmeQnnpj8wcsrqkmnKYvlNkS2wE";
-    }
+      config.apiKey = "MISSING_API_KEY";
+
 
     // Provide safe fallbacks for non-sensitive configuration if the user forgot to add them to Vercel
-    config.authDomain = config.authDomain || "fair-ai.firebaseapp.com";
-    config.projectId = config.projectId || "fair-ai";
-    config.storageBucket = config.storageBucket || "fair-ai.firebasestorage.app";
-    config.messagingSenderId = config.messagingSenderId || "892898039826";
-    config.appId = config.appId || "1:892898039826:web:429092ad366721350fe0cb";
+    config.authDomain = config.authDomain || "";
+    config.projectId = config.projectId || "";
+    config.storageBucket = config.storageBucket || "";
+    config.messagingSenderId = config.messagingSenderId || "";
+    config.appId = config.appId || "";
 
   } catch (error) {
     console.warn("Failed to fetch config from backend, using fallback");
     config = {
-      apiKey: "AIzaSyBlF9F4XmeQnnpj8wcsrqkmnKYvlNkS2wE",
-      authDomain: "fair-ai.firebaseapp.com",
-      projectId: "fair-ai"
+      apiKey: "MISSING_API_KEY",
+      authDomain: "",
+      projectId: ""
     };
   }
 

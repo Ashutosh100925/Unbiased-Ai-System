@@ -25,7 +25,10 @@ let config = null;
 import {
     signInWithPopup,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    updateProfile
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 export let currentUser = null;
@@ -329,6 +332,52 @@ window.handleGoogleSignIn = async () => {
     }
 };
 
+window.handleEmailSignUp = async (name, email, password) => {
+    if (!auth) await firebaseInitPromise;
+    if (!auth) {
+        alert("Auth not initialized");
+        return;
+    }
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+        currentUser = userCredential.user;
+        ensureInitialCredits();
+        if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
+        if (pendingCallback && typeof window.executeWithCredits === 'function') {
+            const callback = pendingCallback;
+            pendingCallback = null;
+            window.executeWithCredits(callback);
+        }
+        return userCredential;
+    } catch (error) {
+        alert("Sign up failed: " + error.message);
+        console.error("Sign-up error:", error);
+    }
+};
+
+window.handleEmailSignIn = async (email, password) => {
+    if (!auth) await firebaseInitPromise;
+    if (!auth) {
+        alert("Auth not initialized");
+        return;
+    }
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        currentUser = userCredential.user;
+        ensureInitialCredits();
+        if (pendingCallback && typeof window.executeWithCredits === 'function') {
+            const callback = pendingCallback;
+            pendingCallback = null;
+            window.executeWithCredits(callback);
+        }
+        return userCredential;
+    } catch (error) {
+        alert("Login failed: " + error.message);
+        console.error("Login error:", error);
+    }
+};
+
 window.requireSignInBeforeAnalysis = (callback) => {
     if (currentUser) {
         window.executeWithCredits(callback);
@@ -363,13 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const mobLoginForm = document.querySelector("#login-view .login-form");
-    if (mobLoginForm) {
-        mobLoginForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            window.handleGoogleSignIn();
-        });
-    }
     document.getElementById("google-signin-btn")?.addEventListener("click", (e) => {
         e.preventDefault();
         window.handleGoogleSignIn();
