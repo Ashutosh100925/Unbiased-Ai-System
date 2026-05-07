@@ -23,19 +23,22 @@ async function initFirebase() {
     }
 
 
-    // Provide safe fallbacks for non-sensitive configuration if the user forgot to add them to Vercel
-    config.authDomain = config.authDomain || "";
-    config.projectId = config.projectId || "";
-    config.storageBucket = config.storageBucket || "";
-    config.messagingSenderId = config.messagingSenderId || "";
-    config.appId = config.appId || "";
+    // Provide safe fallbacks for non-sensitive configuration
+    config.authDomain = config.authDomain || "fair-ai.firebaseapp.com";
+    config.projectId = config.projectId || "fair-ai";
+    config.storageBucket = config.storageBucket || "fair-ai.firebasestorage.app";
+    config.messagingSenderId = config.messagingSenderId || "892898039826";
+    config.appId = config.appId || "1:892898039826:web:429092ad366721350fe0cb";
 
   } catch (error) {
     console.warn("Failed to fetch config from backend, using fallback");
     config = {
       apiKey: "MISSING_API_KEY",
-      authDomain: "",
-      projectId: ""
+      authDomain: "fair-ai.firebaseapp.com",
+      projectId: "fair-ai",
+      storageBucket: "fair-ai.firebasestorage.app",
+      messagingSenderId: "892898039826",
+      appId: "1:892898039826:web:429092ad366721350fe0cb"
     };
   }
 
