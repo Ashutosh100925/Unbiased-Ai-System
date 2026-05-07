@@ -50,6 +50,10 @@ async function initFirebase() {
     const app = initializeApp(config);
     auth = getAuth(app);
     provider = new GoogleAuthProvider();
+    
+    // Masked log for debugging (Safe for production)
+    const maskedKey = config.apiKey ? `${config.apiKey.substring(0, 6)}...` : "NONE";
+    console.log(`DEBUG: Firebase Initialized. Project: ${config.projectId}, Key: ${maskedKey}`);
   } catch (error) {
     console.error("Firebase initialization failed:", error);
   }
