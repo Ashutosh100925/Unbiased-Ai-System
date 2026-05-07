@@ -23,12 +23,12 @@ async function initFirebase() {
     }
 
 
-    // Provide safe fallbacks for non-sensitive configuration
-    config.authDomain = config.authDomain || "fair-ai.firebaseapp.com";
-    config.projectId = config.projectId || "fair-ai";
-    config.storageBucket = config.storageBucket || "fair-ai.firebasestorage.app";
-    config.messagingSenderId = config.messagingSenderId || "892898039826";
-    config.appId = config.appId || "1:892898039826:web:429092ad366721350fe0cb";
+    // Always ensure non-sensitive configuration is present
+    config.authDomain = config.authDomain && config.authDomain !== "null" ? config.authDomain : "fair-ai.firebaseapp.com";
+    config.projectId = config.projectId && config.projectId !== "null" ? config.projectId : "fair-ai";
+    config.storageBucket = config.storageBucket && config.storageBucket !== "null" ? config.storageBucket : "fair-ai.firebasestorage.app";
+    config.messagingSenderId = config.messagingSenderId && config.messagingSenderId !== "null" ? config.messagingSenderId : "892898039826";
+    config.appId = config.appId && config.appId !== "null" ? config.appId : "1:892898039826:web:429092ad366721350fe0cb";
 
   } catch (error) {
     console.warn("Failed to fetch config from backend, using fallback");
