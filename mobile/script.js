@@ -121,16 +121,20 @@ async function fairAiMobileSignOut() {
     }
 }
 
+// Expose to window for auth.js
+window.updateMobileUI = updateMobileUI;
+
 function updateMobileUI(user) {
     const loginView = document.getElementById('login-view');
     const signupView = document.getElementById('signup-view');
     const onboardingView = document.getElementById('onboarding-view');
     const dashboardView = document.getElementById('dashboard-view');
     const bottomNav = document.querySelector('.bottom-nav');
+    const otpView = document.getElementById('otp-view');
     
     // All possible content views that could overlap
     const contentViews = [
-        loginView, signupView, onboardingView, dashboardView,
+        loginView, signupView, onboardingView, dashboardView, otpView,
         document.getElementById('tab-analysis-view'),
         document.getElementById('tab-history-view'),
         document.getElementById('tab-result-view'),
@@ -145,15 +149,31 @@ function updateMobileUI(user) {
     if (bottomNav) bottomNav.classList.add('hidden');
 
     if (user) {
-        // User is signed in
-        const onboarded = false; // Force onboarding check or status
+        // --- NEW OTP CHECK ---
+        // If we are currently verifying a Google OTP, don't show the dashboard/onboarding yet
+        if (window.__fairAiGooglePendingOtp) {
+            console.log("updateMobileUI: Google OTP pending, showing OTP view.");
+            if (otpView) {
+                otpView.classList.remove('hidden');
+                const subtitle = otpView.querySelector('.subtitle');
+                if (subtitle) subtitle.textContent = `Verify your Google account: code sent to ${user.email}`;
+            }
+            return; // STOP HERE
+        }
+
+        // User is signed in and verified
+        // Check if user is already onboarded
+        const onboarded = localStorage.getItem('fairai_mobile_onboarded') === '1';
+        console.log("updateMobileUI: User is verified. Onboarded status:", onboarded);
 
         if (!onboarded) {
+            console.log("updateMobileUI: Showing Onboarding View.");
             if (onboardingView) onboardingView.classList.remove('hidden');
             if (typeof window.resetMobileOnboarding === 'function') {
                 window.resetMobileOnboarding();
             }
         } else {
+            console.log("updateMobileUI: Showing Dashboard View.");
             if (dashboardView) dashboardView.classList.remove('hidden');
             if (bottomNav) bottomNav.classList.remove('hidden');
         }
@@ -407,25 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            if (window.__fairAiGooglePendingOtp && enteredOtp === window.__fairAiGooglePendingOtp) {
+                // Verified Google OTP
+                verifyOtpBtn.classList.add('loading');
+                if (typeof window.verifyGoogleOtp === 'function') {
+                    await window.verifyGoogleOtp();
+                    showMobToast("Google account verified!");
+                }
+                verifyOtpBtn.classList.remove('loading');
+                return;
+            }
+
             if (enteredOtp === window.__fairAiMobGeneratedOtp) {
                 verifyOtpBtn.classList.add('loading');
                 try {
                     const { name, email, password } = window.__fairAiMobPendingSignup;
                     if (typeof window.handleEmailSignUp === 'function') {
                         await window.handleEmailSignUp(name, email, password);
-                        
-                        // Send Welcome Email
-                        try {
-                            const origin = getFairAiApiOrigin();
-                            await fetch(`${origin}/api/send-welcome`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ email, name })
-                            });
-                        } catch (err) {
-                            console.error("Welcome email failed:", err);
-                        }
-
                         showMobToast("Account verified and created!");
                         if (otpView) otpView.classList.add('hidden');
                         // Auth listener in updateMobileUI will handle the rest

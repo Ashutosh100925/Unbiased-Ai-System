@@ -24,11 +24,14 @@ let provider = null;
 let config = null;
 import {
     signInWithPopup,
+    signInWithCredential,
     signOut,
     onAuthStateChanged,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    updateProfile
+    updateProfile,
+    getAdditionalUserInfo,
+    GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 export let currentUser = null;
@@ -321,18 +324,208 @@ window.handleGoogleSignIn = async () => {
 
     try {
         const result = await signInWithPopup(auth, provider);
-        currentUser = result.user;
-        ensureInitialCredits();
-        window.hideSignInModal();
-        if (pendingCallback) {
-            const callback = pendingCallback;
-            pendingCallback = null;
-            window.executeWithCredits(callback);
+        const user = result.user;
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        
+        // Save the credential and user info for later
+        window.__fairAiGooglePendingCredential = credential;
+        window.__fairAiGooglePendingEmail = user.email;
+        window.__fairAiGooglePendingName = user.displayName;
+        window.__fairAiGoogleIsNewUser = !!(getAdditionalUserInfo(result)?.isNewUser);
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        window.__fairAiGooglePendingOtp = otp;
+
+        // IMMEDIATELY SIGN OUT so the app doesn't think we are logged in yet
+        await signOut(auth);
+        currentUser = null;
+
+        // Send OTP via backend
+        try {
+            let origin = "";
+            if (typeof location !== "undefined") {
+                const h = location.hostname;
+                const p = location.port || "";
+                if ((h === "127.0.0.1" || h === "localhost") && p && p !== "8000" && p !== "3000" && p !== "") {
+                    origin = `http://${h === "localhost" ? "127.0.0.1" : h}:8000`;
+                }
+            }
+
+            await fetch(`${origin}/api/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: window.__fairAiGooglePendingEmail, otp: otp })
+            });
+        } catch (err) {
+            console.error("Failed to send OTP:", err);
         }
+
+        // Show OTP UI
+        const desktopOtp = document.getElementById('google-auth-otp');
+        const desktopInitial = document.getElementById('google-auth-initial');
+        const mobileOtpView = document.getElementById('otp-view');
+        const mobileLoginView = document.getElementById('login-view');
+
+        if (desktopOtp && desktopInitial) {
+            desktopInitial.classList.add('hidden');
+            desktopOtp.classList.remove('hidden');
+        } else if (mobileOtpView && mobileLoginView) {
+            mobileLoginView.classList.add('hidden');
+            mobileOtpView.classList.remove('hidden');
+            const subtitle = mobileOtpView.querySelector('.subtitle');
+            if (subtitle) subtitle.textContent = `Verify your Google account: code sent to ${window.__fairAiGooglePendingEmail}`;
+        }
+
     } catch (error) {
         alert("Sign in failed: " + error.message);
         console.error("Detailed sign-in error:", error);
     }
+};
+
+async function finalizeGoogleLogin() {
+    console.log("Entering finalizeGoogleLogin...");
+    try {
+        const credential = window.__fairAiGooglePendingCredential;
+        console.log("Pending Credential found:", !!credential);
+        if (!credential) {
+            console.warn("No pending credential found in window object.");
+            return;
+        }
+
+        // Clear pending data BEFORE signing in so any listeners see it's finished
+        console.log("Clearing pending OTP states...");
+        window.__fairAiGooglePendingOtp = null;
+        window.__fairAiGooglePendingEmail = null;
+
+        // NOW SIGN IN FOR REAL
+        console.log("Calling signInWithCredential...");
+        const result = await signInWithCredential(auth, credential);
+        console.log("signInWithCredential success! User:", result.user.email);
+        
+        currentUser = result.user;
+        window.__fairAiGooglePendingCredential = null; // Clear credential only after success
+        ensureInitialCredits();
+        
+        // Send Welcome Email and force onboarding if new user
+        if (window.__fairAiGoogleIsNewUser) {
+            console.log("New user detected, ensuring onboarding flag is clear...");
+            localStorage.removeItem('fairai_mobile_onboarded');
+            
+            console.log("sending welcome email...");
+            try {
+                const welcomePayload = {
+                    email: currentUser.email,
+                    name: currentUser.displayName || "User"
+                };
+                
+                let origin = "";
+                if (typeof location !== "undefined") {
+                    const h = location.hostname;
+                    const p = location.port || "";
+                    if ((h === "127.0.0.1" || h === "localhost") && p && p !== "8000" && p !== "3000" && p !== "") {
+                        origin = `http://${h === "localhost" ? "127.0.0.1" : h}:8000`;
+                    }
+                }
+
+                fetch(`${origin}/api/send-welcome`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(welcomePayload)
+                }).catch(err => console.error("Welcome email failed:", err));
+            } catch (err) {
+                console.error("Welcome email logic failed:", err);
+            }
+        }
+
+        // Update UI
+        console.log("Updating UI...");
+        
+        // --- FAIL-SAFE: Explicitly hide the OTP views ---
+        const desktopOtp = document.getElementById('google-auth-otp');
+        const mobileOtpView = document.getElementById('otp-view');
+        if (desktopOtp) desktopOtp.classList.add('hidden');
+        if (mobileOtpView) mobileOtpView.classList.add('hidden');
+
+        if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
+        if (typeof window.updateMobileUI === 'function') {
+            console.log("Calling updateMobileUI...");
+            window.updateMobileUI(currentUser);
+        }
+
+        if (pendingCallback) {
+            console.log("Executing pending callback...");
+            const callback = pendingCallback;
+            pendingCallback = null;
+            window.executeWithCredits(callback);
+        }
+        console.log("finalizeGoogleLogin complete.");
+    } catch (error) {
+        console.error("Error in finalizeGoogleLogin:", error);
+        alert("Final sign in failed: " + error.message);
+    }
+}
+
+window.verifyGoogleOtp = async () => {
+    // Get entered OTP from fields
+    const desktopFields = document.querySelectorAll('.otp-field');
+    const mobileFields = document.querySelectorAll('.otp-digit');
+    const fields = desktopFields.length > 0 ? desktopFields : mobileFields;
+    
+    console.log("Verifying OTP... Fields found:", fields.length);
+    const enteredOtp = Array.from(fields).map(f => f.value).join('');
+    console.log("Entered OTP:", enteredOtp);
+    console.log("Expected OTP:", window.__fairAiGooglePendingOtp);
+    
+    if (enteredOtp.length !== 6) {
+        alert("Please enter the 6-digit code.");
+        return;
+    }
+
+    if (enteredOtp === window.__fairAiGooglePendingOtp) {
+        console.log("OTP Match! Calling finalizeGoogleLogin...");
+        try {
+            await finalizeGoogleLogin();
+            console.log("finalizeGoogleLogin successfully called.");
+        } catch (err) {
+            console.error("Error calling finalizeGoogleLogin:", err);
+            alert("Verification error: " + err.message);
+        }
+        
+        // Clean up UI
+        const desktopOtp = document.getElementById('google-auth-otp');
+        const desktopInitial = document.getElementById('google-auth-initial');
+        if (desktopOtp && desktopInitial) {
+            desktopOtp.classList.add('hidden');
+            desktopInitial.classList.remove('hidden');
+        }
+        fields.forEach(f => f.value = '');
+    } else {
+        console.warn("OTP Mismatch.");
+        alert("Invalid verification code. Please try again.");
+        fields.forEach(f => f.value = '');
+        if (fields[0]) fields[0].focus();
+    }
+};
+
+window.resetGoogleSignIn = async () => {
+    const desktopOtp = document.getElementById('google-auth-otp');
+    const desktopInitial = document.getElementById('google-auth-initial');
+    const mobileOtpView = document.getElementById('otp-view');
+    const mobileLoginView = document.getElementById('login-view');
+
+    if (desktopOtp && desktopInitial) {
+        desktopOtp.classList.add('hidden');
+        desktopInitial.classList.remove('hidden');
+    } else if (mobileOtpView && mobileLoginView) {
+        mobileOtpView.classList.add('hidden');
+        mobileLoginView.classList.remove('hidden');
+    }
+
+    // Sign out since login wasn't finalized
+    window.__fairAiGooglePendingOtp = null;
+    window.__fairAiGooglePendingUser = null;
+    if (auth) await signOut(auth);
 };
 
 window.handleEmailSignUp = async (name, email, password) => {
@@ -346,6 +539,32 @@ window.handleEmailSignUp = async (name, email, password) => {
         await updateProfile(userCredential.user, { displayName: name });
         currentUser = userCredential.user;
         ensureInitialCredits();
+
+        // Send Welcome Email
+        try {
+            const welcomePayload = {
+                email: email,
+                name: name || "User"
+            };
+            
+            let origin = "";
+            if (typeof location !== "undefined") {
+                const h = location.hostname;
+                const p = location.port || "";
+                if ((h === "127.0.0.1" || h === "localhost") && p && p !== "8000" && p !== "3000" && p !== "") {
+                    origin = `http://${h === "localhost" ? "127.0.0.1" : h}:8000`;
+                }
+            }
+
+            fetch(`${origin}/api/send-welcome`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(welcomePayload)
+            }).catch(err => console.error("Welcome email fetch failed:", err));
+        } catch (err) {
+            console.error("Welcome email logic failed:", err);
+        }
+
         if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
         if (pendingCallback && typeof window.executeWithCredits === 'function') {
             const callback = pendingCallback;

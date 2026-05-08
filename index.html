@@ -1634,7 +1634,7 @@
                 <p class="text-gray-400 mb-10 leading-relaxed">Please sign in with Google to continue with candidate
                     analysis and bias auditing.</p>
 
-                <div class="space-y-4">
+                <div class="space-y-4" id="google-auth-initial">
                     <button onclick="handleGoogleSignIn()"
                         class="w-full py-4 px-6 bg-white text-[#0B0F19] rounded-full font-bold flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors shadow-lg">
                         <svg class="w-6 h-6" viewBox="0 0 24 24">
@@ -1653,12 +1653,56 @@
                         </svg>
                         Sign in with Google
                     </button>
+                </div>
+
+                <!-- OTP Section (Hidden by default) -->
+                <div id="google-auth-otp" class="hidden mt-6 space-y-6">
+                    <div class="flex justify-center gap-3" id="otp-input-container">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                        <input type="text" maxlength="1" class="otp-field w-12 h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:border-blue-500 focus:bg-white/10 outline-none transition-all">
+                    </div>
+                    <p class="text-sm text-gray-400 text-center">Enter the 6-digit code sent to your Google email.</p>
+                    <button onclick="verifyGoogleOtp()" id="verify-google-otp-btn"
+                        class="w-full py-4 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+                        Verify & Sign In
+                    </button>
+                    <div class="text-center">
+                        <button onclick="resetGoogleSignIn()" class="text-sm text-gray-500 hover:text-white transition-colors">
+                            Back to Google Sign In
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4">
                     <button onclick="hideSignInModal()"
                         class="w-full py-4 px-6 text-gray-400 font-bold hover:text-white transition-colors">
                         Cancel
                     </button>
                 </div>
             </div>
+
+            <script>
+                // OTP Input focus management
+                document.querySelectorAll('.otp-field').forEach((field, idx, fields) => {
+                    field.addEventListener('input', (e) => {
+                        if (e.target.value.length === 1 && idx < fields.length - 1) {
+                            fields[idx + 1].focus();
+                        }
+                    });
+                    field.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                            fields[idx - 1].focus();
+                        }
+                        if (e.key === 'Enter') {
+                            verifyGoogleOtp();
+                        }
+                    });
+                });
+            </script>
         </div>
 
     </div><!-- /#fairai-desktop-root -->

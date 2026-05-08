@@ -238,8 +238,17 @@ async def send_welcome(request: Request):
                 <p>Thank you for being a part of Fair AI.</p>
                 
                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <p style="margin: 0; font-weight: bold;">— Ashutosh Swain</p>
-                    <p style="margin: 0; color: #666;">Team Leader, Fair AI</p>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="padding-right: 15px; vertical-align: middle;">
+                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" alt="Ashutosh Swain" width="50" height="50" style="border-radius: 50%; display: block; object-fit: cover; border: 2px solid #3b82f6;">
+                            </td>
+                            <td style="vertical-align: middle;">
+                                <p style="margin: 0; font-weight: bold; font-size: 16px; color: #333;">— Ashutosh Swain</p>
+                                <p style="margin: 0; color: #666; font-size: 14px;">Team Leader, Fair AI</p>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </body>
