@@ -352,13 +352,27 @@ window.handleGoogleSignIn = async () => {
                 }
             }
 
-            await fetch(`${origin}/api/send-otp`, {
+            const response = await fetch(`${origin}/api/send-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: window.__fairAiGooglePendingEmail, otp: otp })
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Backend Error (500):", errorData.error);
+                if (errorData.detail) console.groupCollapsed("Traceback Details");
+                if (errorData.detail) console.log(errorData.detail);
+                if (errorData.detail) console.groupEnd();
+                
+                // Show a user-friendly alert
+                alert("Failed to send verification email. Please check your internet connection and backend logs.\n\nError: " + errorData.error);
+            } else {
+                console.log("OTP sent successfully to backend.");
+            }
         } catch (err) {
-            console.error("Failed to send OTP:", err);
+            console.error("Fetch Network Error:", err);
+            alert("Network error: Could not connect to backend server.");
         }
 
         // Show OTP UI
