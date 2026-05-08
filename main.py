@@ -1,10 +1,15 @@
 import os
 import sys
-from fastapi import FastAPI, File, Form, UploadFile, Request
+import json
+import traceback
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, Form, UploadFile, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from dotenv import load_dotenv
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -15,17 +20,22 @@ backend_dir = os.path.join(root_dir, "api", "backend_src")
 ai_dir = os.path.join(root_dir, "api", "ai_src")
 
 # Add paths to sys.path so routers can find their services
-sys.path.insert(0, backend_dir)
-sys.path.insert(0, ai_dir)
-sys.path.insert(0, root_dir)
+# Prioritize backend_src and ai_src
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+if ai_dir not in sys.path:
+    sys.path.insert(0, ai_dir)
+if root_dir not in sys.path:
+    sys.path.append(root_dir)
 
-# Import routers from the consolidated backend_src
+# Import routers using absolute paths for better IDE support and clarity
 try:
-    from routers import health, analyze
-    from routers.analyze import execute_document_analysis
+    from api.backend_src.routers import health, analyze
+    from api.backend_src.routers.analyze import execute_document_analysis
 except ImportError:
-    # If standard import fails, try relative to backend_dir
-    sys.path.append(backend_dir)
+    # Fallback: ensure backend_dir is in sys.path and try again
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
     from routers import health, analyze
     from routers.analyze import execute_document_analysis
 
@@ -48,7 +58,6 @@ async def analyze_unified_handler(request: Request):
         from services.ml_service import run_prediction
         return run_prediction(model_type, features)
     except Exception as e:
-        import traceback
         return JSONResponse(
             status_code=500, 
             content={"success": False, "error": str(e), "detail": traceback.format_exc()}
@@ -62,13 +71,16 @@ app.add_api_route("/analyze/", analyze_unified_handler, methods=["GET", "POST"])
 
 @app.post("/api/analyze/document")
 @app.post("/api/analyze/document/")
+@app.post("/analyze/document")
+@app.post("/analyze/document/")
 async def analyze_document_direct(model_type: str = Form(...), file: UploadFile = File(...)):
     try:
-        from routers.analyze import execute_document_analysis
         return await execute_document_analysis(model_type, file)
     except Exception as e:
-        import traceback
-        return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
+        return JSONResponse(
+            status_code=500, 
+            content={"success": False, "error": str(e), "detail": traceback.format_exc()}
+        )
 
 app.add_middleware(
     CORSMiddleware,
@@ -85,18 +97,6 @@ async def debug_logging_middleware(request, call_next):
     response = await call_next(request)
     print(f"DEBUG: Response Status: {response.status_code}")
     return response
-
-@app.post("/api/analyze/document")
-@app.post("/api/analyze/document/")
-@app.post("/analyze/document")
-@app.post("/analyze/document/")
-async def analyze_document_direct(model_type: str = Form(...), file: UploadFile = File(...)):
-    try:
-        from routers.analyze import execute_document_analysis
-        return await execute_document_analysis(model_type, file)
-    except Exception as e:
-        import traceback
-        return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
 @app.get("/api/firebase-config")
 @app.get("/firebase-config")
@@ -121,9 +121,7 @@ async def get_firebase_config_js():
         "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID"),
         "appId": os.getenv("FIREBASE_APP_ID")
     }
-    import json
     js_content = f"window.firebaseConfig = {json.dumps(config)};"
-    from fastapi.responses import Response
     return Response(content=js_content, media_type="application/javascript")
 
 @app.get("/api/debug-routes")
@@ -161,10 +159,6 @@ async def send_otp(request: Request):
             print(f"HACKATHON MOCK EMAIL: To: {email}, Code: {otp}")
             return {"success": True, "message": "OTP sent (Mocked in console)", "mock": True}
 
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-
         message = MIMEMultipart()
         message["From"] = smtp_user
         message["To"] = email
@@ -199,7 +193,6 @@ async def send_otp(request: Request):
 
         return {"success": True, "message": "OTP sent successfully"}
     except Exception as e:
-        import traceback
         print(f"ERROR: SMTP Failure: {str(e)}")
         print(traceback.format_exc())
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
@@ -222,10 +215,6 @@ async def send_welcome(request: Request):
 
         if not smtp_user or not smtp_pass:
             return {"success": True, "message": "Welcome email mocked (No credentials)"}
-
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
 
         message = MIMEMultipart()
         message["From"] = smtp_user
@@ -270,11 +259,8 @@ async def send_welcome(request: Request):
 # SPA + mini-game + shared assets (index.html, script.js, auth.js, Cards/, etc.)
 app.mount("/", StaticFiles(directory=root_dir, html=True), name="static")
 
-from fastapi.responses import JSONResponse
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    import traceback
     return JSONResponse(
         status_code=500,
         content={
