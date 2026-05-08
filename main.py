@@ -225,16 +225,16 @@ async def send_welcome(request: Request):
         <head>
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
             <style>
-                body { margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
-                .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 40px; padding: 60px 40px; border: 1px solid #e2e8f0; }
-                .title { font-size: 36px; font-weight: 800; color: #1e293b; margin: 20px 0; letter-spacing: -1px; }
-                .text { font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 24px; }
-                .highlight { color: #2563eb; font-weight: 700; }
-                .green-box { background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; padding: 24px; margin: 32px 0; }
-                .feature-row { margin-bottom: 24px; }
-                .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
-                .signature-area { margin-top: 48px; border-top: 1px solid #f1f5f9; padding-top: 48px; }
-                .social-icon { width: 32px; height: 32px; border-radius: 16px; background-color: #f1f5f9; margin-right: 8px; }
+                body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
+                .container {{ max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 40px; padding: 60px 40px; border: 1px solid #e2e8f0; }}
+                .title {{ font-size: 36px; font-weight: 800; color: #1e293b; margin: 20px 0; letter-spacing: -1px; }}
+                .text {{ font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 24px; }}
+                .highlight {{ color: #2563eb; font-weight: 700; }}
+                .green-box {{ background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; padding: 24px; margin: 32px 0; }}
+                .feature-row {{ margin-bottom: 24px; }}
+                .icon-box {{ width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }}
+                .signature-area {{ margin-top: 48px; border-top: 1px solid #f1f5f9; padding-top: 48px; }}
+                .social-icon {{ width: 32px; height: 32px; border-radius: 16px; background-color: #f1f5f9; margin-right: 8px; }}
             </style>
         </head>
         <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
