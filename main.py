@@ -162,21 +162,54 @@ async def send_otp(request: Request):
         message = MIMEMultipart()
         message["From"] = smtp_user
         message["To"] = email
-        message["Subject"] = "Your FairAI Verification Code"
+        message["Subject"] = f"Your FairAI Verification Code: {otp}"
 
         body_text = f"""
         <html>
-        <body style="font-family: sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 500px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <h2 style="color: #3b82f6; text-align: center;">Verify Your Account</h2>
-                <p style="font-size: 16px; color: #333;">Welcome to FairAI! Use the following code to verify your identity and complete your registration:</p>
-                <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
-                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1d4ed8;">{otp}</span>
-                </div>
-                <p style="font-size: 14px; color: #666; text-align: center;">This code will expire in 10 minutes. If you didn't request this, please ignore this email.</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
-                <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2024 FairAI Platform</p>
-            </div>
+        <head>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+            <style>
+                body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
+                .container {{ max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 32px; padding: 48px; border: 1px solid #e2e8f0; }}
+                .title {{ font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; letter-spacing: -0.5px; text-align: center; }}
+                .otp-box {{ background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 32px 0; text-align: center; }}
+                .otp-code {{ font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: monospace; }}
+                .footer {{ font-size: 13px; color: #94a3b8; text-align: center; margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 32px; }}
+            </style>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 40px 20px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="500" style="background-color: #ffffff; border-radius: 32px; border: 1px solid #e2e8f0;">
+                            <tr>
+                                <td style="padding: 48px;">
+                                    <div style="text-align: center; margin-bottom: 24px;">
+                                        <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="80" alt="FairAI Logo">
+                                    </div>
+                                    <h1 style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; letter-spacing: -0.5px; text-align: center;">Verify Your Account</h1>
+                                    <p style="font-size: 16px; color: #475569; text-align: center; line-height: 1.6;">
+                                        Welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. Use the code below to complete your registration and secure your account.
+                                    </p>
+                                    
+                                    <div style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 32px 0; text-align: center;">
+                                        <div style="font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: 'Courier New', Courier, monospace;">{otp}</div>
+                                    </div>
+
+                                    <p style="font-size: 14px; color: #64748b; text-align: center; margin-bottom: 0;">
+                                        This code will expire in <span style="font-weight: 600;">10 minutes</span>.<br>
+                                        If you didn't request this, please ignore this email.
+                                    </p>
+
+                                    <div style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 32px;">
+                                        © 2026 Fair AI · Responsible Decision Intelligence
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>
         """
@@ -262,10 +295,10 @@ async def send_welcome(request: Request):
                                     </h1>
 
                                     <!-- Intro Text -->
-                                    <p style="font-size: 18px; color: #475569; margin-bottom: 20px;">
+                                    <p style="font-size: 23px; color: #475569; margin-bottom: 20px;">
                                         Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋
                                     </p>
-                                    <p style="font-size: 16px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
+                                    <p style="font-size: 25px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
                                         I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, sincerely thank you for joining our platform.
                                     </p>
 
@@ -278,7 +311,7 @@ async def send_welcome(request: Request):
                                                         <td style="background-color: #22c55e; width: 28px; height: 28px; border-radius: 14px; text-align: center; vertical-align: middle;">
                                                             <span style="color: #ffffff; font-weight: bold; font-size: 16px;">✓</span>
                                                         </td>
-                                                        <td style="padding-left: 16px; font-size: 16px; color: #334155; font-weight: 500;">
+                                                        <td style="padding-left: 18px; font-size: 16px; color: #334155; font-weight: 500;">
                                                             Your email has been <span style="color: #166534; font-weight: 700;">successfully verified</span> and your account is now active.
                                                         </td>
                                                     </tr>
@@ -291,11 +324,11 @@ async def send_welcome(request: Request):
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px;">
                                         <tr>
                                             <td width="50" style="vertical-align: top;">
-                                                <div style="background-color: #eff6ff; width: 44px; height: 44px; border-radius: 12px; text-align: center;">
-                                                    <span style="line-height: 44px; font-size: 20px;">🚀</span>
+                                                <div style="background-color: #eff6ff; width: 50px; height: 50px; border-radius: 12px; text-align: center;">
+                                                    <span style="line-height: 44px; font-size: 25px;">🚀</span>
                                                 </div>
                                             </td>
-                                            <td style="padding-left: 20px; font-size: 16px; color: #475569;">
+                                            <td style="padding-left: 20px; font-size: 20px; color: #475569;">
                                                 We are excited to have you with us in building a <span style="color: #2563eb; font-weight: 700;">fair, transparent,</span> and <span style="color: #2563eb; font-weight: 700;">intelligent AI-driven future</span>.
                                             </td>
                                         </tr>
@@ -305,11 +338,11 @@ async def send_welcome(request: Request):
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 40px;">
                                         <tr>
                                             <td width="50" style="vertical-align: top;">
-                                                <div style="background-color: #fff1f2; width: 44px; height: 44px; border-radius: 12px; text-align: center;">
-                                                    <span style="line-height: 44px; font-size: 20px;">❤️</span>
+                                                <div style="background-color: #fff1f2; width: 50px; height: 50px; border-radius: 12px; text-align: center;">
+                                                    <span style="line-height: 44px; font-size: 25px;">❤️</span>
                                                 </div>
                                             </td>
-                                            <td style="padding-left: 20px; font-size: 16px; color: #475569;">
+                                            <td style="padding-left: 20px; font-size: 25px; color: #475569;">
                                                 Thank you for being a part of <span style="color: #2563eb; font-weight: 700;">Fair AI</span>.
                                             </td>
                                         </tr>
