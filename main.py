@@ -336,6 +336,10 @@ async def send_welcome(request: Request):
                                                         </td>
                                                         <td width="10"></td>
                                                         <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
+                                                            <a href="https://github.com/Ashutosh100925" style="text-decoration: none; color: #2563eb; font-size: 14px;">git</a>
+                                                        </td>
+                                                        <td width="10"></td>
+                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
                                                             <a href="https://unbiased-ai-system-chda.vercel.app/" style="text-decoration: none; color: #2563eb; font-size: 14px;">🌐</a>
                                                         </td>
                                                     </tr>
