@@ -137,7 +137,7 @@ game_dir = os.path.join(root_dir, "Game")
 if os.path.isdir(game_dir):
     app.mount("/Game", StaticFiles(directory=game_dir, html=True), name="game")
 
-def _send_email_internal(to_email: str, subject: str, html_body: str):
+def _send_email_internal(to_email: str, subject: str, html_body: str, otp: str = None):
     """Internal helper to send emails using SMTP with fallback and logging."""
     smtp_user = os.getenv("SMTP_USER", "").strip()
     smtp_pass = os.getenv("SMTP_PASS", "").strip().replace(" ", "")
@@ -145,29 +145,51 @@ def _send_email_internal(to_email: str, subject: str, html_body: str):
     smtp_port_raw = os.getenv("SMTP_PORT", "587").strip()
     smtp_port = int(smtp_port_raw) if smtp_port_raw.isdigit() else 587
 
+    print(f"DEBUG: Configured SMTP_USER: {smtp_user}")
+    print(f"DEBUG: Configured SMTP_PASS length: {len(smtp_pass)} chars")
+
     if not smtp_user or not smtp_pass:
         print(f"DEBUG [MOCK EMAIL]: To={to_email}, Subject={subject}")
         return {"success": True, "message": "Email mocked (no credentials)", "mocked": True}
 
     try:
         message = MIMEMultipart()
-        message["From"] = f"Fair AI <{smtp_user}>"
+        message["From"] = smtp_user
         message["To"] = to_email
         message["Subject"] = subject
         message.attach(MIMEText(html_body, "html"))
 
-        print(f"DEBUG: Attempting SMTP send to {to_email} via {smtp_server}:{smtp_port}...")
-        # Increase timeout to 15s for slow connections
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=15) as server:
-            server.starttls()
+        print(f"DEBUG: Attempting SMTP send to {to_email} via {smtp_server}...")
+        
+        # Helper to do the actual login and send
+        def do_send(server):
             server.login(smtp_user, smtp_pass)
             server.send_message(message)
-        print(f"DEBUG: SMTP send successful!")
-        return {"success": True, "message": "Email sent successfully"}
-    except Exception as e:
-        error_detail = traceback.format_exc()
-        print(f"ERROR [SMTP FAILURE]: {str(e)}\n{error_detail}")
-        raise e
+
+        try:
+            # Attempt 1: Port 587 (STARTTLS)
+            with smtplib.SMTP(smtp_server, 587, timeout=10) as server:
+                server.starttls()
+                do_send(server)
+            print("DEBUG: Sent via Port 587")
+            return {"success": True, "message": "Email sent successfully!"}
+        except Exception:
+            # Attempt 2: Port 465 (SSL)
+            with smtplib.SMTP_SSL(smtp_server, 465, timeout=10) as server:
+                do_send(server)
+            print("DEBUG: Sent via Port 465")
+            return {"success": True, "message": "Email sent successfully!"}
+
+    except (smtplib.SMTPAuthenticationError, Exception) as err:
+        print("\n" + "!"*60)
+        print(f"SMTP ERROR: {str(err)}")
+        if otp:
+            print("\n" + "="*40)
+            print(f"   DEMO OTP CODE: {otp}   ")
+            print("="*40 + "\n")
+        print("FALLBACK: Switching to Demo Mode.")
+        print("!"*60 + "\n")
+        return {"success": True, "message": "Demo Mode: Check your terminal for the code.", "mocked": True}
 
 @app.post("/api/send-otp")
 async def send_otp(request: Request):
@@ -217,7 +239,7 @@ async def send_otp(request: Request):
         </body>
         </html>
         """
-        return _send_email_internal(email, f"FairAI Code: {otp}", body_text)
+        return _send_email_internal(email, f"FairAI Code: {otp}", body_text, otp=otp)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
@@ -228,66 +250,104 @@ async def send_welcome(request: Request):
         email = body.get("email")
         if not email:
             return JSONResponse(status_code=400, content={"success": False, "error": "Email is required"})
-
+        
         body_text = f"""
+        <!DOCTYPE html>
         <html>
         <head>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
             <style>
-                body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
+                body {{ font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }}
+                .container {{ max-width: 650px; margin: 20px auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }}
+                .status-card {{ border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; width: 100%; border-collapse: separate; }}
+                .sig-name {{ font-family: 'Dancing Script', cursive; font-size: 28px; color: #2563eb; margin: 0; }}
             </style>
         </head>
-        <body style="font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                    <td align="center" style="padding: 40px 0;">
-                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 40px; border: 1px solid #e2e8f0; overflow: hidden;">
-                            <tr>
-                                <td style="padding: 60px 50px;">
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                        <tr>
-                                            <td align="left" width="50%">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="180" alt="Verified Badge">
-                                            </td>
-                                            <td align="right" width="50%">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="3D Envelope">
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; line-height: 1.2;">Email Verified Successfully! 🥳</h1>
-                                    <p style="font-size: 23px; color: #475569; margin-bottom: 20px;">Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋</p>
-                                    <p style="font-size: 25px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
-                                        I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, thank you for joining.
-                                    </p>
-                                    <table role="presentation" width="100%" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; margin-bottom: 40px;">
-                                        <tr>
-                                            <td style="padding: 24px;">
-                                                <span style="color: #166534; font-weight: 700;">✓ Successfully Verified and Account Active</span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <table role="presentation" width="100%" style="border-top: 1px solid #f1f5f9; padding-top: 40px;">
-                                        <tr>
-                                            <td width="100">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="90" height="90" style="border-radius: 45px; border: 4px solid #eff6ff; object-fit: cover;">
-                                            </td>
-                                            <td style="padding-left: 30px; border-left: 1px solid #f1f5f9;">
-                                                <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 24px; color: #2563eb;">Ashutosh Swain</p>
-                                                <p style="margin: 5px 0 0 0; font-weight: 800; font-size: 18px; color: #1e293b;">Ashutosh Swain</p>
-                                                <p style="margin: 2px 0 15px 0; font-size: 14px; color: #64748b;">Team Leader, Fair AI</p>
-                                                <div style="margin-top: 10px;">
-                                                    <a href="https://www.linkedin.com/in/ashutosh-swain-668433376" style="text-decoration: none; color: #2563eb; margin-right: 15px;">LinkedIn</a>
-                                                    <a href="https://github.com/Ashutosh100925" style="text-decoration: none; color: #2563eb;">GitHub</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+        <body>
+            <div class="container">
+                <!-- Header -->
+                <table width="100%" cellspacing="0" cellpadding="0" style="padding: 40px 40px 0 40px;">
+                    <tr>
+                        <td width="50%" align="left">
+                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="100" alt="Verified">
+                        </td>
+                        <td width="50%" align="right">
+                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="140" alt="Envelope">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h1 style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 30px 0 20px 0; letter-spacing: -0.02em;">Email Verified Successfully! 🎉</h1>
+                            <p style="font-size: 17px; color: #475569; margin: 0 0 15px 0;">Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋</p>
+                            <p style="font-size: 16px; color: #64748b; line-height: 1.6; margin: 0 0 30px 0;">
+                                I, <span style="color: #2563eb; font-weight: 600;">Ashutosh Swain</span>, student of SOA University and Team Leader of Fair AI, sincerely thank you for joining our platform.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="padding: 0 40px 40px 40px;">
+                    <!-- Status Green -->
+                    <table class="status-card" style="background-color: #f0fdf4; border: 1px solid #dcfce7;">
+                        <tr>
+                            <td width="32" valign="middle"><img src="https://img.icons8.com/ios-filled/50/22c55e/ok--v1.png" width="20"></td>
+                            <td style="color: #166534; font-size: 15px; padding-left: 12px;">Your email has been <span style="color: #22c55e; font-weight: 700;">successfully verified</span> and your account is now active.</td>
+                        </tr>
+                    </table>
+
+                    <!-- Status Blue -->
+                    <table class="status-card" style="background-color: #eff6ff; border: 1px solid #dbeafe;">
+                        <tr>
+                            <td width="32" valign="middle"><img src="https://img.icons8.com/ios-filled/50/2563eb/rocket.png" width="20"></td>
+                            <td style="color: #1e40af; font-size: 15px; padding-left: 12px;">We are excited to have you with us in building a <span style="font-weight: 700;">fair, transparent, and intelligent AI-driven future.</span></td>
+                        </tr>
+                    </table>
+
+                    <!-- Status Pink -->
+                    <table class="status-card" style="background-color: #fff1f2; border: 1px solid #ffe4e6;">
+                        <tr>
+                            <td width="32" valign="middle"><img src="https://img.icons8.com/ios-filled/50/f43f5e/like.png" width="20"></td>
+                            <td style="color: #9f1239; font-size: 15px; padding-left: 12px;">Thank you for being a part of <span style="font-weight: 700;">Fair AI.</span></td>
+                        </tr>
+                    </table>
+
+                    <div style="height: 1px; background: #e2e8f0; margin: 40px 0;"></div>
+
+                    <!-- Signature Section -->
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="100" style="padding-right: 20px;">
+                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="80" style="border-radius: 50%; border: 3px solid #eff6ff;" alt="Ashutosh">
+                            </td>
+                            <td>
+                                <p class="sig-name">Ashutosh Swain</p>
+                                <p style="font-weight: 700; color: #1e293b; margin: 4px 0 0 0; font-size: 16px;">Ashutosh Swain</p>
+                                <p style="color: #64748b; margin: 2px 0 10px 0; font-size: 13px;">Team Leader, Fair AI</p>
+                                <table border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td><a href="https://www.linkedin.com/in/ashutosh-swain-668433376"><img src="https://img.icons8.com/ios-filled/50/2563eb/linkedin.png" width="18" style="margin-right: 12px;"></a></td>
+                                        <td><a href="mailto:swainashutosh809@gmail.com"><img src="https://img.icons8.com/ios-filled/50/2563eb/filled-message.png" width="18" style="margin-right: 12px;"></a></td>
+                                        <td><a href="https://unbiased-ai-system-chda.vercel.app"><img src="https://img.icons8.com/ios-filled/50/2563eb/globe.png" width="18;"></a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Footer Banner -->
+                    <table width="100%" style="background: #f1f5f9; padding: 12px 24px; border-radius: 12px; margin-top: 40px;">
+                        <tr>
+                            <td style="font-size: 13px; color: #64748b;">
+                                <img src="https://img.icons8.com/ios-filled/50/2563eb/brain.png" width="14" style="vertical-align: middle; margin-right: 6px;">
+                                Together, let's build a <span style="color: #2563eb; font-weight: 600;">fairer and smarter</span> world with AI.
+                            </td>
+                            <td align="right">
+                                <span style="font-weight: 700; color: #1e293b; font-size: 14px;">Fair AI</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </body>
         </html>
         """

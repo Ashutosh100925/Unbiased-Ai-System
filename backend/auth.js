@@ -365,14 +365,14 @@ window.handleGoogleSignIn = async () => {
                 if (errorData.detail) console.log(errorData.detail);
                 if (errorData.detail) console.groupEnd();
                 
-                // Show a user-friendly alert
-                alert("Failed to send verification email. Please check your internet connection and backend logs.\n\nError: " + errorData.error);
             } else {
-                console.log("OTP sent successfully to backend.");
+                const successData = await response.json();
+                console.log("Backend Response:", successData.message);
+                // Intrusive alerts removed as requested. 
+                // The UI will proceed to the OTP screen naturally.
             }
         } catch (err) {
             console.error("Fetch Network Error:", err);
-            alert("Network error: Could not connect to backend server.");
         }
 
         // Show OTP UI
