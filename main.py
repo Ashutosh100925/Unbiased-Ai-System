@@ -137,6 +137,37 @@ game_dir = os.path.join(root_dir, "Game")
 if os.path.isdir(game_dir):
     app.mount("/Game", StaticFiles(directory=game_dir, html=True), name="game")
 
+def _send_email_internal(to_email: str, subject: str, html_body: str):
+    """Internal helper to send emails using SMTP with fallback and logging."""
+    smtp_user = os.getenv("SMTP_USER", "").strip()
+    smtp_pass = os.getenv("SMTP_PASS", "").strip().replace(" ", "")
+    smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com").strip()
+    smtp_port_raw = os.getenv("SMTP_PORT", "587").strip()
+    smtp_port = int(smtp_port_raw) if smtp_port_raw.isdigit() else 587
+
+    if not smtp_user or not smtp_pass:
+        print(f"DEBUG [MOCK EMAIL]: To={to_email}, Subject={subject}")
+        return {"success": True, "message": "Email mocked (no credentials)", "mocked": True}
+
+    try:
+        message = MIMEMultipart()
+        message["From"] = smtp_user
+        message["To"] = to_email
+        message["Subject"] = subject
+        message.attach(MIMEText(html_body, "html"))
+
+        print(f"DEBUG: Attempting SMTP send to {to_email} via {smtp_server}...")
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=10) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.send_message(message)
+        print(f"DEBUG: SMTP send successful!")
+        return {"success": True, "message": "Email sent successfully"}
+    except Exception as e:
+        error_detail = traceback.format_exc()
+        print(f"ERROR [SMTP]: {str(e)}\n{error_detail}")
+        raise e
+
 @app.post("/api/send-otp")
 async def send_otp(request: Request):
     try:
@@ -147,23 +178,6 @@ async def send_otp(request: Request):
         if not email or not otp:
             return JSONResponse(status_code=400, content={"success": False, "error": "Email and OTP are required"})
 
-        # SMTP Configuration (Requires environment variables)
-        smtp_user = os.getenv("SMTP_USER", "").strip()
-        smtp_pass = os.getenv("SMTP_PASS", "").strip().replace(" ", "")
-        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com").strip()
-        smtp_port_raw = os.getenv("SMTP_PORT", "587").strip()
-        smtp_port = int(smtp_port_raw) if smtp_port_raw.isdigit() else 587
-
-        if not smtp_user or not smtp_pass:
-            # Fallback for hackathon demo if no keys provided: log it and return success
-            print(f"HACKATHON MOCK EMAIL: To: {email}, Code: {otp}")
-            return {"success": True, "message": "OTP sent (Mocked in console)", "mock": True}
-
-        message = MIMEMultipart()
-        message["From"] = smtp_user
-        message["To"] = email
-        message["Subject"] = f"Your FairAI Verification Code: {otp}"
-
         body_text = f"""
         <html>
         <head>
@@ -173,37 +187,27 @@ async def send_otp(request: Request):
                 .container {{ max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 32px; padding: 48px; border: 1px solid #e2e8f0; }}
                 .title {{ font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; letter-spacing: -0.5px; text-align: center; }}
                 .otp-box {{ background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 32px 0; text-align: center; }}
-                .otp-code {{ font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: monospace; }}
-                .footer {{ font-size: 13px; color: #94a3b8; text-align: center; margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 32px; }}
+                .otp-code {{ font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: 'Courier New', Courier, monospace; }}
             </style>
         </head>
         <body style="margin: 0; padding: 0; background-color: #f8fafc;">
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <table role="presentation" width="100%">
                 <tr>
                     <td align="center" style="padding: 40px 20px;">
-                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="500" style="background-color: #ffffff; border-radius: 32px; border: 1px solid #e2e8f0;">
+                        <table role="presentation" width="500" style="background-color: #ffffff; border-radius: 32px; border: 1px solid #e2e8f0;">
                             <tr>
                                 <td style="padding: 48px;">
                                     <div style="text-align: center; margin-bottom: 24px;">
-                                        <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="80" alt="FairAI Logo">
+                                        <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="80" alt="Logo">
                                     </div>
-                                    <h1 style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; letter-spacing: -0.5px; text-align: center;">Verify Your Account</h1>
-                                    <p style="font-size: 16px; color: #475569; text-align: center; line-height: 1.6;">
-                                        Welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. Use the code below to complete your registration and secure your account.
-                                    </p>
-                                    
-                                    <div style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 32px 0; text-align: center;">
-                                        <div style="font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: 'Courier New', Courier, monospace;">{otp}</div>
+                                    <h1 style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; text-align: center;">Verify Your Account</h1>
+                                    <p style="font-size: 16px; color: #475569; text-align: center;">Use this code to secure your account:</p>
+                                    <div style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 24px 0; text-align: center;">
+                                        <div style="font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: monospace;">{otp}</div>
                                     </div>
-
-                                    <p style="font-size: 14px; color: #64748b; text-align: center; margin-bottom: 0;">
-                                        This code will expire in <span style="font-weight: 600;">10 minutes</span>.<br>
-                                        If you didn't request this, please ignore this email.
-                                    </p>
-
-                                    <div style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 32px;">
+                                    <p style="font-size: 13px; color: #94a3b8; text-align: center; margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 32px;">
                                         © 2026 Fair AI · Responsible Decision Intelligence
-                                    </div>
+                                    </p>
                                 </td>
                             </tr>
                         </table>
@@ -213,46 +217,19 @@ async def send_otp(request: Request):
         </body>
         </html>
         """
-        message.attach(MIMEText(body_text, "html"))
-
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            print(f"DEBUG: Connecting to {smtp_server}:{smtp_port}...")
-            server.starttls()
-            print(f"DEBUG: Logging in as {smtp_user}...")
-            server.login(smtp_user, smtp_pass)
-            print(f"DEBUG: Sending message to {email}...")
-            server.send_message(message)
-            print(f"DEBUG: Email sent successfully!")
-
-        return {"success": True, "message": "OTP sent successfully"}
+        result = _send_email_internal(email, f"FairAI Code: {otp}", body_text)
+        return result
     except Exception as e:
-        print(f"ERROR: SMTP Failure: {str(e)}")
-        print(traceback.format_exc())
-        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
 @app.post("/api/send-welcome")
 async def send_welcome(request: Request):
     try:
         body = await request.json()
         email = body.get("email")
-        name = body.get("name", "User")
-        
         if not email:
             return JSONResponse(status_code=400, content={"success": False, "error": "Email is required"})
 
-        smtp_user = os.getenv("SMTP_USER", "").strip()
-        smtp_pass = os.getenv("SMTP_PASS", "").strip().replace(" ", "")
-        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com").strip()
-        smtp_port_raw = os.getenv("SMTP_PORT", "587").strip()
-        smtp_port = int(smtp_port_raw) if smtp_port_raw.isdigit() else 587
-
-        if not smtp_user or not smtp_pass:
-            return {"success": True, "message": "Welcome email mocked (No credentials)"}
-
-        message = MIMEMultipart()
-        message["From"] = smtp_user
-        message["To"] = email
-        message["Subject"] = "🎉 Email Verified Successfully! Welcome to Fair AI"
         body_text = f"""
         <html>
         <head>
@@ -260,49 +237,34 @@ async def send_welcome(request: Request):
             <style>
                 body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
                 .container {{ max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 40px; padding: 60px 40px; border: 1px solid #e2e8f0; }}
-                .title {{ font-size: 36px; font-weight: 800; color: #1e293b; margin: 20px 0; letter-spacing: -1px; }}
-                .text {{ font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 24px; }}
-                .highlight {{ color: #2563eb; font-weight: 700; }}
-                .green-box {{ background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; padding: 24px; margin: 32px 0; }}
-                .feature-row {{ margin-bottom: 24px; }}
-                .icon-box {{ width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }}
-                .signature-area {{ margin-top: 48px; border-top: 1px solid #f1f5f9; padding-top: 48px; }}
-                .social-icon {{ width: 32px; height: 32px; border-radius: 16px; background-color: #f1f5f9; margin-right: 8px; }}
             </style>
         </head>
-        <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
-            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc;">
+        <body style="font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                     <td align="center" style="padding: 40px 0;">
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 40px; border: 1px solid #e2e8f0; overflow: hidden;">
                             <tr>
                                 <td style="padding: 60px 50px;">
-                                    <!-- Header Icons -->
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                                         <tr>
                                             <td align="left" width="50%">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="180" alt="Verified Badge" style="display: block; border: 0;">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="180" alt="Verified Badge">
                                             </td>
                                             <td align="right" width="50%">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="3D Envelope" style="display: block; border: 0;">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="Envelope">
                                             </td>
                                         </tr>
                                     </table>
-
-                                    <!-- Title -->
-                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; letter-spacing: -1px; line-height: 1.2;">
+                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; line-height: 1.2;">
                                         Email Verified<br>Successfully! 🥳
                                     </h1>
-
-                                    <!-- Intro Text -->
                                     <p style="font-size: 23px; color: #475569; margin-bottom: 20px;">
                                         Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋
                                     </p>
                                     <p style="font-size: 25px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
                                         I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, sincerely thank you for joining our platform.
                                     </p>
-
-                                    <!-- Status Box -->
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; margin-bottom: 40px;">
                                         <tr>
                                             <td style="padding: 24px;">
@@ -312,125 +274,39 @@ async def send_welcome(request: Request):
                                                             <span style="color: #ffffff; font-weight: bold; font-size: 16px;">✓</span>
                                                         </td>
                                                         <td style="padding-left: 18px; font-size: 16px; color: #334155; font-weight: 500;">
-                                                            Your email has been <span style="color: #166534; font-weight: 700;">successfully verified</span> and your account is now active.
+                                                            Your email has been <span style="color: #166534; font-weight: 700;">successfully verified</span>.
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </td>
                                         </tr>
                                     </table>
-
-                                    <!-- Feature 1 -->
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px;">
-                                        <tr>
-                                            <td width="50" style="vertical-align: top;">
-                                                <div style="background-color: #eff6ff; width: 50px; height: 50px; border-radius: 12px; text-align: center;">
-                                                    <span style="line-height: 44px; font-size: 25px;">🚀</span>
-                                                </div>
-                                            </td>
-                                            <td style="padding-left: 20px; font-size: 20px; color: #475569;">
-                                                We are excited to have you with us in building a <span style="color: #2563eb; font-weight: 700;">fair, transparent,</span> and <span style="color: #2563eb; font-weight: 700;">intelligent AI-driven future</span>.
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <!-- Feature 2 -->
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 40px;">
-                                        <tr>
-                                            <td width="50" style="vertical-align: top;">
-                                                <div style="background-color: #fff1f2; width: 50px; height: 50px; border-radius: 12px; text-align: center;">
-                                                    <span style="line-height: 44px; font-size: 25px;">❤️</span>
-                                                </div>
-                                            </td>
-                                            <td style="padding-left: 20px; font-size: 25px; color: #475569;">
-                                                Thank you for being a part of <span style="color: #2563eb; font-weight: 700;">Fair AI</span>.
-                                            </td>
-                                        </tr>
-                                    </table>
-
                                     <!-- Signature -->
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f1f5f9; padding-top: 40px;">
                                         <tr>
                                             <td width="100" style="vertical-align: middle;">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="90" height="90" style="border-radius: 45px; border: 4px solid #eff6ff; display: block; object-fit: cover;">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="90" height="90" style="border-radius: 45px; border: 4px solid #eff6ff; object-fit: cover;">
                                             </td>
-                                            <td style="padding-left: 30px; border-left: 1px solid #f1f5f9; padding-left: 30px;">
+                                            <td style="padding-left: 30px; border-left: 1px solid #f1f5f9;">
                                                 <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 24px; color: #2563eb;">Ashutosh Swain</p>
                                                 <p style="margin: 5px 0 0 0; font-weight: 800; font-size: 18px; color: #1e293b;">Ashutosh Swain</p>
                                                 <p style="margin: 2px 0 15px 0; font-size: 14px; color: #64748b;">Team Leader, Fair AI</p>
-                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
-                                                            <a href="https://www.linkedin.com/in/ashutosh-swain-668433376" style="text-decoration: none; color: #2563eb; font-size: 14px;">in</a>
-                                                        </td>
-                                                        <td width="10"></td>
-                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
-                                                            <a href="mailto:swainashutosh809@gmail.com" style="text-decoration: none; color: #2563eb; font-size: 14px;">✉</a>
-                                                        </td>
-                                                        <td width="10"></td>
-                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
-                                                            <a href="https://github.com/Ashutosh100925" style="text-decoration: none;">
-                                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/github_logo.png" width="18" height="18" style="display: inline-block; vertical-align: middle; border: 0;" alt="GitHub">
-                                                            </a>
-                                                        </td>
-                                                        <td width="10"></td>
-                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
-                                                            <a href="https://unbiased-ai-system-chda.vercel.app/" style="text-decoration: none; color: #2563eb; font-size: 14px;">🌐</a>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <!-- Footer Banner -->
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 40px; background-color: #f8fafc; border-radius: 20px;">
-                                        <tr>
-                                            <td style="padding: 20px;">
-                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                                    <tr>
-                                                        <td width="40">
-                                                            <div style="background-color: #2563eb; width: 32px; height: 32px; border-radius: 16px; text-align: center; line-height: 32px;">
-                                                                <span style="color: white; font-size: 16px;">❤</span>
-                                                            </div>
-                                                        </td>
-                                                        <td style="font-size: 14px; color: #64748b;">
-                                                            Together, let's build a <span style="color: #2563eb; font-weight: 700;">fairer and smarter</span> world with AI.
-                                                        </td>
-                                                        <td align="right">
-                                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                                                <tr>
-                                                                    <td style="font-weight: 800; font-size: 16px; color: #1e293b; padding-left: 10px;">Fair AI</td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </table>
                                             </td>
                                         </tr>
                                     </table>
                                 </td>
                             </tr>
                         </table>
-                        <p style="margin-top: 30px; color: #94a3b8; font-size: 13px;">
-                            © 2026 Fair AI · Responsible Decision Intelligence
-                        </p>
                     </td>
                 </tr>
             </table>
         </body>
         </html>
         """
-        message.attach(MIMEText(body_text, "html"))
-
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(smtp_user, smtp_pass)
-            server.send_message(message)
-
-        return {"success": True, "message": "Welcome email sent successfully"}
+        result = _send_email_internal(email, "🎉 Email Verified Successfully!", body_text)
+        return result
     except Exception as e:
-        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
 # SPA + mini-game + shared assets (index.html, script.js, auth.js, Cards/, etc.)
 app.mount("/", StaticFiles(directory=root_dir, html=True), name="static")
