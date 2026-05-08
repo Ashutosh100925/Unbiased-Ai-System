@@ -232,10 +232,10 @@ async def send_welcome(request: Request):
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                         <tr>
                             <td>
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100px; height: 100px;">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 160px; height: 160px;">
                                     <tr>
-                                        <td align="center" valign="middle" style="height: 100px;">
-                                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/image.png" width="100" height="100" style="display: block; border: 0;">
+                                        <td align="center" valign="middle" style="height: 160px;">
+                                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/image.png" width="160" height="160" style="display: block; border: 0;">
                                         </td>
                                     </tr>
                                 </table>
