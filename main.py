@@ -336,7 +336,9 @@ async def send_welcome(request: Request):
                                                         </td>
                                                         <td width="10"></td>
                                                         <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
-                                                            <a href="https://github.com/Ashutosh100925" style="text-decoration: none; color: #2563eb; font-size: 14px;">git</a>
+                                                            <a href="https://github.com/Ashutosh100925" style="text-decoration: none;">
+                                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/github_logo.png" width="18" height="18" style="display: inline-block; vertical-align: middle; border: 0;" alt="GitHub">
+                                                            </a>
                                                         </td>
                                                         <td width="10"></td>
                                                         <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
