@@ -3440,3 +3440,84 @@ footer {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
+
+/* ── SUCCESS VIEW STYLES ────────────────────────────────────────── */
+#google-auth-success {
+    animation: fadeInScale 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.success-illustration {
+    width: 120px;
+    height: 100px;
+}
+
+.envelope-body {
+    width: 80px;
+    height: 50px;
+    background: #4285F4;
+    border-radius: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    box-shadow: 0 10px 20px rgba(66, 133, 244, 0.3);
+    z-index: 2;
+}
+
+.envelope-flap {
+    width: 80px;
+    height: 40px;
+    background: #3474d4;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    z-index: 4;
+}
+
+.envelope-card {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 25px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    animation: slideUpIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    z-index: 1;
+}
+
+@keyframes slideUpIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(-10px); opacity: 1; }
+}
+
+#signin-modal {
+    max-width: 520px !important; /* Increased to match the rich design */
+    width: 95% !important;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.dark-mode #signin-modal {
+    background: #111827 !important; /* Deep gray/blue */
+}
+
+.success-illustration .confetti {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Custom Signature Font usage */
+.font-signature {
+    font-family: 'Dancing Script', cursive;
+}

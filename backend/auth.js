@@ -441,13 +441,21 @@ async function finalizeGoogleLogin() {
         // Update UI
         console.log("Updating UI...");
         
-        // --- FAIL-SAFE: Explicitly hide the OTP views ---
+        // --- TRANSITION TO SUCCESS VIEW ---
         const desktopOtp = document.getElementById('google-auth-otp');
+        const desktopSuccess = document.getElementById('google-auth-success');
         const mobileOtpView = document.getElementById('otp-view');
-        if (desktopOtp) desktopOtp.classList.add('hidden');
-        if (mobileOtpView) mobileOtpView.classList.add('hidden');
+        const signinCancelBtn = document.getElementById('signin-cancel-btn');
+        
+        if (desktopOtp && desktopSuccess) {
+            desktopOtp.classList.add('hidden');
+            desktopSuccess.classList.remove('hidden');
+            if (signinCancelBtn) signinCancelBtn.classList.add('hidden');
+        } else if (mobileOtpView) {
+            mobileOtpView.classList.add('hidden');
+            if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
+        }
 
-        if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
         if (typeof window.updateMobileUI === 'function') {
             console.log("Calling updateMobileUI...");
             window.updateMobileUI(currentUser);

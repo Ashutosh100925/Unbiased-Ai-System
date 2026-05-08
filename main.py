@@ -220,36 +220,66 @@ async def send_welcome(request: Request):
         message["From"] = smtp_user
         message["To"] = email
         message["Subject"] = "🎉 Email Verified Successfully! Welcome to Fair AI"
-
         body_text = f"""
         <html>
-        <body style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px;">
-            <div style="background: white; border-radius: 12px; padding: 40px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <h2 style="color: #3b82f6; margin-bottom: 24px;">🎉 Email Verified Successfully!</h2>
+        <head>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+        </head>
+        <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #374151; max-width: 600px; margin: auto; padding: 40px 20px; background-color: #f3f4f6;">
+            <div style="background: white; border-radius: 24px; padding: 48px; border: 1px solid #e5e7eb; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
                 
-                <p>Hello and welcome to <strong>Fair AI</strong>.</p>
+                <div style="margin-bottom: 32px;">
+                    <div style="width: 48px; height: 48px; background-color: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                         <img src="https://unbiased-ai-system-chda.vercel.app/assets/image.png" width="24" height="24" style="display: block;">
+                    </div>
+                    <h2 style="color: #111827; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.025em;">Email Verified Successfully! 🎉</h2>
+                </div>
                 
-                <p>I, <strong>Ashutosh Swain</strong>, student of SOA University and Team Leader of Fair AI, sincerely thank you for joining our platform.</p>
+                <p style="margin-bottom: 24px; font-size: 16px; color: #4b5563;">Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋</p>
                 
-                <p>Your email has been successfully verified and your account is now active.</p>
+                <p style="margin-bottom: 24px; font-size: 16px; color: #4b5563;">I, <strong>Ashutosh Swain</strong>, student of SOA University and Team Leader of Fair AI, sincerely thank you for joining our platform.</p>
                 
-                <p>We are excited to have you with us in building a fair, transparent, and intelligent AI-driven future.</p>
+                <div style="background-color: #ecfdf5; border: 1px solid #10b98120; border-radius: 16px; padding: 20px; margin-bottom: 32px; display: flex; align-items: center;">
+                    <div style="background-color: #10b981; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px; flex-shrink: 0;">✓</div>
+                    <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 500;">Your email has been <span style="text-decoration: underline; font-weight: 700;">successfully verified</span> and your account is now active.</p>
+                </div>
                 
-                <p>Thank you for being a part of Fair AI.</p>
+                <div style="margin-bottom: 32px;">
+                    <div style="display: flex; align-items: start; margin-bottom: 16px;">
+                        <span style="font-size: 20px; margin-right: 12px;">🚀</span>
+                        <p style="margin: 0; font-size: 15px; color: #4b5563;">We are excited to have you with us in building a <span style="color: #111827; font-weight: 600;">fair, transparent, and intelligent AI-driven future</span>.</p>
+                    </div>
+                    <div style="display: flex; align-items: start;">
+                        <span style="font-size: 20px; margin-right: 12px;">❤️</span>
+                        <p style="margin: 0; font-size: 15px; color: #4b5563;">Thank you for being a part of <span style="color: #111827; font-weight: 600;">Fair AI</span>.</p>
+                    </div>
+                </div>
                 
-                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid #f3f4f6;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
                         <tr>
-                            <td style="padding-right: 15px; vertical-align: middle;">
-                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" alt="Ashutosh Swain" width="50" height="50" style="border-radius: 50%; display: block; object-fit: cover; border: 2px solid #3b82f6;">
+                            <td style="width: 64px; vertical-align: middle;">
+                                <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 2px solid #2563eb; background-color: #f3f4f6;">
+                                    <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" alt="Ashutosh Swain" width="60" height="60" style="display: block; object-fit: cover;">
+                                </div>
                             </td>
-                            <td style="vertical-align: middle;">
-                                <p style="margin: 0; font-weight: bold; font-size: 16px; color: #333;">— Ashutosh Swain</p>
-                                <p style="margin: 0; color: #666; font-size: 14px;">Team Leader, Fair AI</p>
+                            <td style="vertical-align: middle; padding-left: 20px;">
+                                <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 22px; color: #2563eb; line-height: 1;">Ashutosh Swain</p>
+                                <p style="margin: 4px 0 0 0; font-weight: 700; font-size: 18px; color: #111827;">Ashutosh Swain</p>
+                                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px; font-weight: 500;">Team Leader, Fair AI</p>
                             </td>
                         </tr>
                     </table>
                 </div>
+
+                <div style="margin-top: 32px; background-color: #eff6ff; border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+                    <p style="margin: 0; font-size: 12px; color: #6b7280;">Together, let's build a <span style="color: #2563eb; font-weight: 700;">fairer and smarter</span> world.</p>
+                    <div style="font-weight: 800; color: #111827; font-size: 14px;">Fair AI</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px;">
+                <p style="color: #9ca3af; font-size: 12px;">© 2025 Fair AI · Responsible Decision Intelligence</p>
             </div>
         </body>
         </html>

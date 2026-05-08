@@ -7,8 +7,10 @@
     <title>FairAI — Unbiased Decision Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;500;700&family=Google+Sans+Text:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <!-- Firebase Configuration is now handled entirely within firebase.js asynchronously -->
 
     <link rel="stylesheet" href="/style.css">
@@ -1677,7 +1679,106 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
+                <!-- Success Section (Hidden by default) -->
+                <div id="google-auth-success" class="hidden text-left relative overflow-hidden">
+                    <!-- Top Illustration Area -->
+                    <div class="relative flex justify-between items-start mb-8">
+                        <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/image.png" class="w-10 h-10 object-contain">
+                        </div>
+                        <!-- 3D-ish Envelope Illustration (Styled via CSS) -->
+                        <div class="success-illustration relative">
+                            <div class="envelope-body"></div>
+                            <div class="envelope-flap"></div>
+                            <div class="envelope-card">
+                                <span class="material-symbols-outlined text-blue-500">check_circle</span>
+                            </div>
+                            <div class="confetti"></div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-3xl font-extrabold text-white mb-6">Email Verified Successfully! <span class="text-2xl">🎉</span></h2>
+                    
+                    <p class="text-gray-300 text-[15px] mb-6 leading-relaxed">
+                        Hello and welcome to <span class="text-blue-400 font-bold">Fair AI</span>. 👋<br><br>
+                        I, <span class="font-bold text-white">Ashutosh Swain</span>, student of SOA University and Team Leader of Fair AI, sincerely thank you for joining our platform.
+                    </p>
+
+                    <div class="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-green-500 text-sm">check</span>
+                        </div>
+                        <p class="text-green-400 text-sm font-medium">Your email has been <span class="font-bold underline">successfully verified</span> and your account is now active.</p>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                                <span class="material-symbols-outlined text-blue-400">rocket_launch</span>
+                            </div>
+                            <p class="text-gray-400 text-sm leading-snug">We are excited to have you with us in building a <span class="text-white font-medium">fair, transparent, and intelligent AI-driven future</span>.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                                <span class="material-symbols-outlined text-pink-400">favorite</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Thank you for being a part of <span class="text-white font-medium">Fair AI</span>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-px w-full bg-white/10 mb-8"></div>
+
+                    <!-- Signature Section -->
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-full border-2 border-blue-500/50 p-1 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                                    <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" alt="Ashutosh Swain" class="w-full h-full rounded-full object-cover">
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-[#131936] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white text-[10px]">verified</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-['Dancing_Script'] text-blue-400 text-xl leading-none mb-1">Ashutosh Swain</p>
+                                <p class="font-bold text-white text-base leading-tight">Ashutosh Swain</p>
+                                <p class="text-gray-500 text-xs font-medium">Team Leader, Fair AI</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="#" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-blue-400 hover:border-blue-400/50 transition-all">
+                                <i class="fab fa-linkedin-in text-xs"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-blue-400 hover:border-blue-400/50 transition-all">
+                                <i class="far fa-envelope text-xs"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-blue-400 hover:border-blue-400/50 transition-all">
+                                <i class="fas fa-globe text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Banner -->
+                    <div class="bg-blue-600/10 border border-blue-500/10 rounded-2xl p-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shadow-lg">
+                                <span class="material-symbols-outlined text-white text-sm">favorite</span>
+                            </div>
+                            <p class="text-[11px] font-medium text-gray-400">Together, let's build a <span class="text-blue-400 font-bold">fairer and smarter</span> world with AI.</p>
+                        </div>
+                        <div class="flex items-center gap-2 pr-2">
+                            <span class="material-symbols-outlined text-blue-400 text-sm">psychology</span>
+                            <span class="text-white font-bold text-sm tracking-tight">Fair AI</span>
+                        </div>
+                    </div>
+
+                    <button onclick="hideSignInModal()" class="w-full mt-6 py-4 px-6 bg-white/5 text-gray-400 rounded-full font-bold hover:bg-white/10 hover:text-white transition-all text-sm">
+                        Continue to Dashboard
+                    </button>
+                </div>
+
+                <div class="mt-4" id="signin-cancel-btn">
                     <button onclick="hideSignInModal()"
                         class="w-full py-4 px-6 text-gray-400 font-bold hover:text-white transition-colors">
                         Cancel
@@ -1983,9 +2084,52 @@
                 }, 300);
             }
         }
+        function showSignInModal() {
+            const overlay = document.getElementById('signin-overlay');
+            const modal = document.getElementById('signin-modal');
+            const initial = document.getElementById('google-auth-initial');
+            const otp = document.getElementById('google-auth-otp');
+            const success = document.getElementById('google-auth-success');
+            const cancelBtn = document.getElementById('signin-cancel-btn');
+
+            if (overlay && modal) {
+                // Reset views to initial state
+                if (initial) initial.classList.remove('hidden');
+                if (otp) otp.classList.add('hidden');
+                if (success) success.classList.add('hidden');
+                if (cancelBtn) cancelBtn.classList.remove('hidden');
+
+                overlay.classList.remove('hidden');
+                modal.classList.remove('hidden');
+                // Trigger reflow
+                void modal.offsetWidth;
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+                modal.classList.add('scale-100');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function hideSignInModal() {
+            const overlay = document.getElementById('signin-overlay');
+            const modal = document.getElementById('signin-modal');
+            if (overlay && modal) {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+                modal.classList.remove('scale-100');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+        }
+
         window.closeLowCreditsModal = closeLowCreditsModal;
         window.openGameOverlay = openGameOverlay;
         window.closeGameOverlay = closeGameOverlay;
+        window.showSignInModal = showSignInModal;
+        window.hideSignInModal = hideSignInModal;
     </script>
 </body>
 
