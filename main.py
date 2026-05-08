@@ -223,112 +223,162 @@ async def send_welcome(request: Request):
         body_text = f"""
         <html>
         <head>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+            <style>
+                body { margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+                .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 40px; padding: 60px 40px; border: 1px solid #e2e8f0; }
+                .title { font-size: 36px; font-weight: 800; color: #1e293b; margin: 20px 0; letter-spacing: -1px; }
+                .text { font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 24px; }
+                .highlight { color: #2563eb; font-weight: 700; }
+                .green-box { background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; padding: 24px; margin: 32px 0; }
+                .feature-row { margin-bottom: 24px; }
+                .icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
+                .signature-area { margin-top: 48px; border-top: 1px solid #f1f5f9; padding-top: 48px; }
+                .social-icon { width: 32px; height: 32px; border-radius: 16px; background-color: #f1f5f9; margin-right: 8px; }
+            </style>
         </head>
-        <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #374151; max-width: 600px; margin: auto; padding: 40px 20px; background-color: #f3f4f6;">
-            <div style="background: white; border-radius: 24px; padding: 48px; border: 1px solid #e5e7eb; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-                
-                <div style="margin-bottom: 32px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td>
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 200px; height: 200px;">
-                                    <tr>
-                                        <td align="center" valign="middle" style="height: 200px;">
-                                            <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="200" height="200" style="display: block; border: 0;">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding-top: 24px;">
-                                <h2 style="color: #111827; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.025em;">Email Verified Successfully! 🎉</h2>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <p style="margin-bottom: 24px; font-size: 16px; color: #4b5563;">Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋</p>
-                
-                <p style="margin-bottom: 24px; font-size: 16px; color: #4b5563;">I, <strong>Ashutosh Swain</strong>, student of SOA University and Team Leader of Fair AI, sincerely thank you for joining our platform.</p>
-                
-                <div style="background-color: #ecfdf5; border: 1px solid #10b98120; border-radius: 16px; padding: 20px; margin-bottom: 32px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <td style="width: 24px; vertical-align: middle;">
-                                <div style="background-color: #10b981; color: white; width: 24px; height: 24px; border-radius: 12px; text-align: center; line-height: 24px; font-size: 14px;">✓</div>
-                            </td>
-                            <td style="padding-left: 12px; vertical-align: middle;">
-                                <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 500;">Your email has been <span style="text-decoration: underline; font-weight: 700;">successfully verified</span> and your account is now active.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="margin-bottom: 32px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <td style="vertical-align: top; padding-bottom: 16px;">
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="font-size: 20px; padding-right: 12px; vertical-align: top;">🚀</td>
-                                        <td style="vertical-align: top;">
-                                            <p style="margin: 0; font-size: 15px; color: #4b5563;">We are excited to have you with us in building a <span style="color: #111827; font-weight: 600;">fair, transparent, and intelligent AI-driven future</span>.</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: top;">
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="font-size: 20px; padding-right: 12px; vertical-align: top;">❤️</td>
-                                        <td style="vertical-align: top;">
-                                            <p style="margin: 0; font-size: 15px; color: #4b5563;">Thank you for being a part of <span style="color: #111827; font-weight: 600;">Fair AI</span>.</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                
-                <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid #f3f4f6;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <td style="width: 64px; vertical-align: middle;">
-                                <div style="width: 60px; height: 60px; border-radius: 30px; overflow: hidden; border: 2px solid #2563eb; background-color: #f3f4f6;">
-                                    <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" alt="Ashutosh Swain" width="60" height="60" style="display: block; object-fit: cover; border: 0;">
-                                </div>
-                            </td>
-                            <td style="vertical-align: middle; padding-left: 20px;">
-                                <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 22px; color: #2563eb; line-height: 1;">Ashutosh Swain</p>
-                                <p style="margin: 4px 0 0 0; font-weight: 700; font-size: 18px; color: #111827;">Ashutosh Swain</p>
-                                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px; font-weight: 500;">Team Leader, Fair AI</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+        <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc;">
+                <tr>
+                    <td align="center" style="padding: 40px 0;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 40px; border: 1px solid #e2e8f0; overflow: hidden;">
+                            <tr>
+                                <td style="padding: 60px 50px;">
+                                    <!-- Header Icons -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td align="left" width="50%">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="180" alt="Verified Badge" style="display: block; border: 0;">
+                                            </td>
+                                            <td align="right" width="50%">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="3D Envelope" style="display: block; border: 0;">
+                                            </td>
+                                        </tr>
+                                    </table>
 
-                <div style="margin-top: 32px; background-color: #eff6ff; border-radius: 12px; padding: 16px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
-                        <tr>
-                            <td style="vertical-align: middle;">
-                                <p style="margin: 0; font-size: 12px; color: #6b7280;">Together, let's build a <span style="color: #2563eb; font-weight: 700;">fairer and smarter</span> world.</p>
-                            </td>
-                            <td style="vertical-align: middle; text-align: right;">
-                                <div style="font-weight: 800; color: #111827; font-size: 14px;">Fair AI</div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 24px;">
-                <p style="color: #9ca3af; font-size: 12px;">© 2025 Fair AI · Responsible Decision Intelligence</p>
-            </div>
+                                    <!-- Title -->
+                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; letter-spacing: -1px; line-height: 1.2;">
+                                        Email Verified<br>Successfully! 🥳
+                                    </h1>
+
+                                    <!-- Intro Text -->
+                                    <p style="font-size: 18px; color: #475569; margin-bottom: 20px;">
+                                        Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋
+                                    </p>
+                                    <p style="font-size: 16px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
+                                        I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, sincerely thank you for joining our platform.
+                                    </p>
+
+                                    <!-- Status Box -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; margin-bottom: 40px;">
+                                        <tr>
+                                            <td style="padding: 24px;">
+                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td style="background-color: #22c55e; width: 28px; height: 28px; border-radius: 14px; text-align: center; vertical-align: middle;">
+                                                            <span style="color: #ffffff; font-weight: bold; font-size: 16px;">✓</span>
+                                                        </td>
+                                                        <td style="padding-left: 16px; font-size: 16px; color: #334155; font-weight: 500;">
+                                                            Your email has been <span style="color: #166534; font-weight: 700;">successfully verified</span> and your account is now active.
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Feature 1 -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px;">
+                                        <tr>
+                                            <td width="50" style="vertical-align: top;">
+                                                <div style="background-color: #eff6ff; width: 44px; height: 44px; border-radius: 12px; text-align: center;">
+                                                    <span style="line-height: 44px; font-size: 20px;">🚀</span>
+                                                </div>
+                                            </td>
+                                            <td style="padding-left: 20px; font-size: 16px; color: #475569;">
+                                                We are excited to have you with us in building a <span style="color: #2563eb; font-weight: 700;">fair, transparent,</span> and <span style="color: #2563eb; font-weight: 700;">intelligent AI-driven future</span>.
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Feature 2 -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 40px;">
+                                        <tr>
+                                            <td width="50" style="vertical-align: top;">
+                                                <div style="background-color: #fff1f2; width: 44px; height: 44px; border-radius: 12px; text-align: center;">
+                                                    <span style="line-height: 44px; font-size: 20px;">❤️</span>
+                                                </div>
+                                            </td>
+                                            <td style="padding-left: 20px; font-size: 16px; color: #475569;">
+                                                Thank you for being a part of <span style="color: #2563eb; font-weight: 700;">Fair AI</span>.
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Signature -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f1f5f9; padding-top: 40px;">
+                                        <tr>
+                                            <td width="100" style="vertical-align: middle;">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="90" height="90" style="border-radius: 45px; border: 4px solid #eff6ff; display: block; object-fit: cover;">
+                                            </td>
+                                            <td style="padding-left: 30px; border-left: 1px solid #f1f5f9; padding-left: 30px;">
+                                                <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 24px; color: #2563eb;">Ashutosh Swain</p>
+                                                <p style="margin: 5px 0 0 0; font-weight: 800; font-size: 18px; color: #1e293b;">Ashutosh Swain</p>
+                                                <p style="margin: 2px 0 15px 0; font-size: 14px; color: #64748b;">Team Leader, Fair AI</p>
+                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
+                                                            <a href="#" style="text-decoration: none; color: #2563eb; font-size: 14px;">in</a>
+                                                        </td>
+                                                        <td width="10"></td>
+                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
+                                                            <a href="#" style="text-decoration: none; color: #2563eb; font-size: 14px;">✉</a>
+                                                        </td>
+                                                        <td width="10"></td>
+                                                        <td style="background-color: #eff6ff; width: 32px; height: 32px; border-radius: 16px; text-align: center; vertical-align: middle;">
+                                                            <a href="#" style="text-decoration: none; color: #2563eb; font-size: 14px;">🌐</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Footer Banner -->
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 40px; background-color: #f8fafc; border-radius: 20px;">
+                                        <tr>
+                                            <td style="padding: 20px;">
+                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td width="40">
+                                                            <div style="background-color: #2563eb; width: 32px; height: 32px; border-radius: 16px; text-align: center; line-height: 32px;">
+                                                                <span style="color: white; font-size: 16px;">❤</span>
+                                                            </div>
+                                                        </td>
+                                                        <td style="font-size: 14px; color: #64748b;">
+                                                            Together, let's build a <span style="color: #2563eb; font-weight: 700;">fairer and smarter</span> world with AI.
+                                                        </td>
+                                                        <td align="right">
+                                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                    <td style="font-weight: 800; font-size: 16px; color: #1e293b; padding-left: 10px;">Fair AI</td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="margin-top: 30px; color: #94a3b8; font-size: 13px;">
+                            © 2026 Fair AI · Responsible Decision Intelligence
+                        </p>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>
         """
