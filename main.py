@@ -151,13 +151,14 @@ def _send_email_internal(to_email: str, subject: str, html_body: str):
 
     try:
         message = MIMEMultipart()
-        message["From"] = smtp_user
+        message["From"] = f"Fair AI <{smtp_user}>"
         message["To"] = to_email
         message["Subject"] = subject
         message.attach(MIMEText(html_body, "html"))
 
-        print(f"DEBUG: Attempting SMTP send to {to_email} via {smtp_server}...")
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=10) as server:
+        print(f"DEBUG: Attempting SMTP send to {to_email} via {smtp_server}:{smtp_port}...")
+        # Increase timeout to 15s for slow connections
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=15) as server:
             server.starttls()
             server.login(smtp_user, smtp_pass)
             server.send_message(message)
@@ -165,7 +166,7 @@ def _send_email_internal(to_email: str, subject: str, html_body: str):
         return {"success": True, "message": "Email sent successfully"}
     except Exception as e:
         error_detail = traceback.format_exc()
-        print(f"ERROR [SMTP]: {str(e)}\n{error_detail}")
+        print(f"ERROR [SMTP FAILURE]: {str(e)}\n{error_detail}")
         raise e
 
 @app.post("/api/send-otp")
@@ -185,13 +186,12 @@ async def send_otp(request: Request):
             <style>
                 body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
                 .container {{ max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 32px; padding: 48px; border: 1px solid #e2e8f0; }}
-                .title {{ font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; letter-spacing: -0.5px; text-align: center; }}
                 .otp-box {{ background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 32px 0; text-align: center; }}
                 .otp-code {{ font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: 'Courier New', Courier, monospace; }}
             </style>
         </head>
         <body style="margin: 0; padding: 0; background-color: #f8fafc;">
-            <table role="presentation" width="100%">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                     <td align="center" style="padding: 40px 20px;">
                         <table role="presentation" width="500" style="background-color: #ffffff; border-radius: 32px; border: 1px solid #e2e8f0;">
@@ -201,7 +201,7 @@ async def send_otp(request: Request):
                                         <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="80" alt="Logo">
                                     </div>
                                     <h1 style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 16px; text-align: center;">Verify Your Account</h1>
-                                    <p style="font-size: 16px; color: #475569; text-align: center;">Use this code to secure your account:</p>
+                                    <p style="font-size: 16px; color: #475569; text-align: center; line-height: 1.6;">Use the code below to secure your account:</p>
                                     <div style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 20px; padding: 32px; margin: 24px 0; text-align: center;">
                                         <div style="font-size: 42px; font-weight: 800; letter-spacing: 8px; color: #2563eb; font-family: monospace;">{otp}</div>
                                     </div>
@@ -217,8 +217,7 @@ async def send_otp(request: Request):
         </body>
         </html>
         """
-        result = _send_email_internal(email, f"FairAI Code: {otp}", body_text)
-        return result
+        return _send_email_internal(email, f"FairAI Code: {otp}", body_text)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
@@ -236,7 +235,6 @@ async def send_welcome(request: Request):
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
             <style>
                 body {{ margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Inter', sans-serif; }}
-                .container {{ max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 40px; padding: 60px 40px; border: 1px solid #e2e8f0; }}
             </style>
         </head>
         <body style="font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0;">
@@ -252,45 +250,35 @@ async def send_welcome(request: Request):
                                                 <img src="https://unbiased-ai-system-chda.vercel.app/assets/verified_success.png" width="180" alt="Verified Badge">
                                             </td>
                                             <td align="right" width="50%">
-                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="Envelope">
+                                                <img src="https://unbiased-ai-system-chda.vercel.app/assets/envelope_3d.png" width="160" alt="3D Envelope">
                                             </td>
                                         </tr>
                                     </table>
-                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; line-height: 1.2;">
-                                        Email Verified<br>Successfully! 🥳
-                                    </h1>
-                                    <p style="font-size: 23px; color: #475569; margin-bottom: 20px;">
-                                        Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋
-                                    </p>
+                                    <h1 style="font-size: 38px; font-weight: 800; color: #1e293b; margin: 40px 0 30px 0; line-height: 1.2;">Email Verified Successfully! 🥳</h1>
+                                    <p style="font-size: 23px; color: #475569; margin-bottom: 20px;">Hello and welcome to <span style="color: #2563eb; font-weight: 700;">Fair AI</span>. 👋</p>
                                     <p style="font-size: 25px; color: #475569; margin-bottom: 30px; line-height: 1.6;">
-                                        I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, sincerely thank you for joining our platform.
+                                        I, <span style="color: #2563eb; font-weight: 700;">Ashutosh Swain</span>, student of SOA University and Team Leader of <span style="color: #2563eb;">Fair AI</span>, thank you for joining.
                                     </p>
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; margin-bottom: 40px;">
+                                    <table role="presentation" width="100%" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 16px; margin-bottom: 40px;">
                                         <tr>
                                             <td style="padding: 24px;">
-                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td style="background-color: #22c55e; width: 28px; height: 28px; border-radius: 14px; text-align: center; vertical-align: middle;">
-                                                            <span style="color: #ffffff; font-weight: bold; font-size: 16px;">✓</span>
-                                                        </td>
-                                                        <td style="padding-left: 18px; font-size: 16px; color: #334155; font-weight: 500;">
-                                                            Your email has been <span style="color: #166534; font-weight: 700;">successfully verified</span>.
-                                                        </td>
-                                                    </tr>
-                                                </table>
+                                                <span style="color: #166534; font-weight: 700;">✓ Successfully Verified and Account Active</span>
                                             </td>
                                         </tr>
                                     </table>
-                                    <!-- Signature -->
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f1f5f9; padding-top: 40px;">
+                                    <table role="presentation" width="100%" style="border-top: 1px solid #f1f5f9; padding-top: 40px;">
                                         <tr>
-                                            <td width="100" style="vertical-align: middle;">
+                                            <td width="100">
                                                 <img src="https://unbiased-ai-system-chda.vercel.app/assets/Leader.jpeg" width="90" height="90" style="border-radius: 45px; border: 4px solid #eff6ff; object-fit: cover;">
                                             </td>
                                             <td style="padding-left: 30px; border-left: 1px solid #f1f5f9;">
                                                 <p style="margin: 0; font-family: 'Dancing Script', cursive; font-size: 24px; color: #2563eb;">Ashutosh Swain</p>
                                                 <p style="margin: 5px 0 0 0; font-weight: 800; font-size: 18px; color: #1e293b;">Ashutosh Swain</p>
                                                 <p style="margin: 2px 0 15px 0; font-size: 14px; color: #64748b;">Team Leader, Fair AI</p>
+                                                <div style="margin-top: 10px;">
+                                                    <a href="https://www.linkedin.com/in/ashutosh-swain-668433376" style="text-decoration: none; color: #2563eb; margin-right: 15px;">LinkedIn</a>
+                                                    <a href="https://github.com/Ashutosh100925" style="text-decoration: none; color: #2563eb;">GitHub</a>
+                                                </div>
                                             </td>
                                         </tr>
                                     </table>
@@ -303,8 +291,7 @@ async def send_welcome(request: Request):
         </body>
         </html>
         """
-        result = _send_email_internal(email, "🎉 Email Verified Successfully!", body_text)
-        return result
+        return _send_email_internal(email, "🎉 Welcome to Fair AI!", body_text)
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e), "detail": traceback.format_exc()})
 
