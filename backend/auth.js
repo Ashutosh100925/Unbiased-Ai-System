@@ -341,41 +341,7 @@ window.handleGoogleSignIn = async () => {
         await signOut(auth);
         currentUser = null;
 
-        // Send OTP via backend
-        try {
-            let origin = "";
-            if (typeof location !== "undefined") {
-                const h = location.hostname;
-                const p = location.port || "";
-                if ((h === "127.0.0.1" || h === "localhost") && p && p !== "8000" && p !== "3000" && p !== "") {
-                    origin = `http://${h === "localhost" ? "127.0.0.1" : h}:8000`;
-                }
-            }
-
-            const response = await fetch(`${origin}/api/send-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: window.__fairAiGooglePendingEmail, otp: otp })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Backend Error (500):", errorData.error);
-                if (errorData.detail) console.groupCollapsed("Traceback Details");
-                if (errorData.detail) console.log(errorData.detail);
-                if (errorData.detail) console.groupEnd();
-                
-            } else {
-                const successData = await response.json();
-                console.log("Backend Response:", successData.message);
-                // Intrusive alerts removed as requested. 
-                // The UI will proceed to the OTP screen naturally.
-            }
-        } catch (err) {
-            console.error("Fetch Network Error:", err);
-        }
-
-        // Show OTP UI
+        // Show OTP UI IMMEDIATELY
         const desktopOtp = document.getElementById('google-auth-otp');
         const desktopInitial = document.getElementById('google-auth-initial');
         const mobileOtpView = document.getElementById('otp-view');
@@ -389,6 +355,39 @@ window.handleGoogleSignIn = async () => {
             mobileOtpView.classList.remove('hidden');
             const subtitle = mobileOtpView.querySelector('.subtitle');
             if (subtitle) subtitle.textContent = `Verify your Google account: code sent to ${window.__fairAiGooglePendingEmail}`;
+        }
+
+        // Send OTP via backend in parallel (no need to await it before showing UI)
+        try {
+            let origin = "";
+            if (typeof location !== "undefined") {
+                const h = location.hostname;
+                const p = location.port || "";
+                if ((h === "127.0.0.1" || h === "localhost") && p && p !== "8000" && p !== "3000" && p !== "") {
+                    origin = `http://${h === "localhost" ? "127.0.0.1" : h}:8000`;
+                }
+            }
+
+            fetch(`${origin}/api/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: window.__fairAiGooglePendingEmail, otp: otp })
+            }).then(async (response) => {
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Backend Error (500):", errorData.error);
+                    if (errorData.detail) console.groupCollapsed("Traceback Details");
+                    if (errorData.detail) console.log(errorData.detail);
+                    if (errorData.detail) console.groupEnd();
+                } else {
+                    const successData = await response.json();
+                    console.log("Backend Response:", successData.message);
+                }
+            }).catch(err => {
+                console.error("Fetch Network Error:", err);
+            });
+        } catch (err) {
+            console.error("OTP Request setup error:", err);
         }
 
     } catch (error) {
@@ -457,13 +456,12 @@ async function finalizeGoogleLogin() {
         
         // --- TRANSITION TO SUCCESS VIEW ---
         const desktopOtp = document.getElementById('google-auth-otp');
-        const desktopSuccess = document.getElementById('google-auth-success');
         const mobileOtpView = document.getElementById('otp-view');
         const signinCancelBtn = document.getElementById('signin-cancel-btn');
         
-        if (desktopOtp && desktopSuccess) {
+        if (desktopOtp) {
             desktopOtp.classList.add('hidden');
-            desktopSuccess.classList.remove('hidden');
+            if (typeof window.hideSignInModal === 'function') window.hideSignInModal();
             if (signinCancelBtn) signinCancelBtn.classList.add('hidden');
         } else if (mobileOtpView) {
             mobileOtpView.classList.add('hidden');

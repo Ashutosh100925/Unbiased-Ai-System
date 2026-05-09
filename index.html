@@ -1954,9 +1954,12 @@
             function updateScene() {
                 rafId = null;
 
+                const nav = document.getElementById('main-nav');
+                const stickyTop = nav ? nav.offsetHeight : 64;
                 const rect = story.getBoundingClientRect();
-                const totalScrollable = story.offsetHeight - window.innerHeight;
-                const progress = clamp(-rect.top / totalScrollable, 0, 1);
+                const totalScrollable = story.offsetHeight - window.innerHeight + stickyTop;
+                if (totalScrollable <= 0) return;
+                const progress = clamp((stickyTop - rect.top) / totalScrollable, 0, 1);
 
                 const targetFrame = Math.floor(progress * (PLAYBACK_FRAMES - 1)) + 1;
 
