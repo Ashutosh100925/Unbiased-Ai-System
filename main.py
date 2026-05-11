@@ -56,7 +56,15 @@ async def analyze_unified_handler(request: Request):
         features = body.get("features")
         
         from services.ml_service import run_prediction
-        return run_prediction(model_type, features)
+        result = run_prediction(model_type, features)
+        if result.get("prediction") is None:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "detail": result.get("explanation", "Invalid or insufficient data provided.")}
+            )
+        return result
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"success": False, "detail": str(e)})
     except Exception as e:
         return JSONResponse(
             status_code=500, 
@@ -76,6 +84,11 @@ app.add_api_route("/analyze/", analyze_unified_handler, methods=["GET", "POST"])
 async def analyze_document_direct(model_type: str = Form(...), file: UploadFile = File(...)):
     try:
         return await execute_document_analysis(model_type, file)
+    except ValueError as e:
+        return JSONResponse(
+            status_code=400, 
+            content={"success": False, "detail": str(e)}
+        )
     except Exception as e:
         return JSONResponse(
             status_code=500, 

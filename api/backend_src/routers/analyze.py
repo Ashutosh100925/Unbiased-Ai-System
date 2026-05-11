@@ -23,6 +23,9 @@ async def analyze_data(request: AnalysisRequestPayload):
         # Phase 2 ML Prediction Execution
         ml_results = run_prediction(request.model_type, request.features)
         
+        if ml_results.get("prediction") is None:
+            raise ValueError(ml_results.get("explanation", "Invalid or insufficient data provided."))
+            
         result = {
             "status": "success",
             "model_type": request.model_type,
@@ -112,14 +115,15 @@ async def execute_document_analysis(model_type: str, file: UploadFile) -> dict:
     elif filename.endswith(".txt"):
         text = content.decode("utf-8")
         features = {
-            "text_density": len(text),
-            "complexity_score": len(text.split()),
-            "domain_relevance": (len(text) % 10) + 1,
+            "document_content": text
         }
     else:
         raise ValueError(f"Format Validation Error: {filename} is not supported. Please use CSV, JSON, or TXT.")
 
     ml_results = run_prediction(model_type, features)
+
+    if ml_results.get("prediction") is None:
+        raise ValueError(ml_results.get("explanation", "Invalid or insufficient document content provided."))
 
     return {
         "status": "success",

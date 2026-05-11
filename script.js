@@ -556,6 +556,30 @@ function matchesHiringCommunication(text) {
     return patterns.some(pattern => pattern instanceof RegExp ? pattern.test(lower) : lower.includes(pattern));
 }
 
+function matchesCollegeAcademics(text) {
+    const lower = text.toLowerCase();
+    const patterns = [/\bmarks?\b/, /\bacademics?\b/, /\bscore\b/, /\bgrade\b/, /%\b/, /\bgpa\b/, /\bperformance\b/, /\bschool\b/, /\bcollege\b/];
+    return patterns.some(pattern => pattern.test(lower));
+}
+
+function matchesCollegeProjects(text) {
+    const lower = text.toLowerCase();
+    const patterns = [/\bprojects?\b/, /\bresearch\b/, /\bwork\b/, /\bassignment\b/, /\bexperiment\b/, /\btechnical\b/, /\bactivit(y|ies)\b/];
+    return patterns.some(pattern => pattern.test(lower));
+}
+
+function matchesCollegeAchievements(text) {
+    const lower = text.toLowerCase();
+    const patterns = [/\bachievements?\b/, /\bawards?\b/, /\bparticipat(e|ed|ing|ion)\b/, /\bextracurricular\b/, /\bhackathons?\b/, /\bcompetitions?\b/];
+    return patterns.some(pattern => pattern.test(lower));
+}
+
+function matchesCollegeCommunication(text) {
+    const lower = text.toLowerCase();
+    const patterns = [/\bcommunication\b/, /\bleadership\b/, /\bskills?\b/, /\bteamwork\b/, /\bspeak(ing)?\b/];
+    return patterns.some(pattern => pattern.test(lower));
+}
+
 function validateInput(text, type) {
     const lower = text.toLowerCase();
     if (text.length < 20) return { valid: false, message: 'Input too short.' };
@@ -575,8 +599,14 @@ function validateInput(text, type) {
 
         if (count < 2) return { valid: false, message: 'Input is incomplete for detected type.' };
     } else if (type === 'COLLEGE_ADMISSION') {
-        const matches = ['marks', 'academics', '%', 'projects', 'achievements', 'communication'].filter(k => lower.includes(k));
-        if (matches.length < 2) return { valid: false, message: 'Input is incomplete for detected type.' };
+        const validationSignals = {
+            academics: matchesCollegeAcademics(text),
+            projects: matchesCollegeProjects(text),
+            achievements: matchesCollegeAchievements(text),
+            communication: matchesCollegeCommunication(text),
+        };
+        const count = Object.values(validationSignals).filter(Boolean).length;
+        if (count < 2) return { valid: false, message: 'Input is incomplete for detected type.' };
     } else if (type === 'LOAN_APPROVAL') {
         const loanSignals = getLoanValidationSignals(text);
         const count = Object.values(loanSignals).filter(Boolean).length;

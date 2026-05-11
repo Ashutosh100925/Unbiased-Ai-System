@@ -142,23 +142,23 @@ DECISION_CONFIG = {
         },
         "keywords": {
             "academics": {
-                "positive": [r"\b9\d%\b", r"\b9\.?\d?\s*gpa\b", r"\bexcellent\b", r"\bstrong\b", r"\bhigh\b", r"\btop\b", r"\b90%\b", r"\b95%\b"],
-                "negative": [r"\b55%\b", r"\blow marks?\b", r"\bweak academic", r"\bpoor academic", r"\bbasic\b"],
+                "positive": [r"\b9\d%\b", r"\b9\.?\d?\s*gpa\b", r"\bexcellent\b", r"\bstrong\b", r"\bhigh\b", r"\btop\b", r"\b90%\b", r"\b95%\b", r"\bmarks?\b", r"\bacademics?\b", r"\bexceptional\b", r"\bperformance\b"],
+                "negative": [r"\b[1-6]\d%\b", r"\blow marks?\b", r"\bweak academic", r"\bpoor academic", r"\bbasic\b", r"\blow academic\b", r"\bweak performance\b"],
             },
             "projects": {
-                "positive": [r"\bprojects?\b", r"\brobotics\b", r"\btechnical work\b", r"\bai\b", r"\bpython\b", r"\bmultiple projects\b"],
-                "negative": [r"\bno project", r"\blimited project", r"\bno experience\b"],
+                "positive": [r"\bprojects?\b", r"\brobotics\b", r"\btechnical work\b", r"\bai\b", r"\bpython\b", r"\bmultiple projects\b", r"\bprogramming\b", r"\biot\b", r"\bsoftware\b", r"\btechnical\b", r"\bactivit(y|ies)\b"],
+                "negative": [r"\bno projects?\b", r"\blimited projects?\b", r"\bno experience\b", r"\bno project work\b", r"\bnot\s+participated\b", r"\bno\s+technical\b"],
             },
             "achievements": {
-                "positive": [r"\bhackathon", r"\bnational-?level\b", r"\bstate-?level\b", r"\bcompetition", r"\baward", r"\bachievement"],
-                "negative": [r"\bno achievement", r"\bno competition", r"\bnone\b"],
+                "positive": [r"\bhackathon", r"\bnational-?level\b", r"\bstate-?level\b", r"\bcompetition", r"\baward", r"\bachievement", r"\bexhibitions?\b", r"\bextracurricular\b", r"\bparticipat(e|ed|ion)\b"],
+                "negative": [r"\bno achievements?\b", r"\bno competition\b", r"\bnone\b", r"\bno extracurricular\b", r"\bnot\s+participated\b"],
             },
             "communication": {
                 "positive": [r"\bcommunication\b", r"\bleadership\b", r"\bstrong communication\b", r"\bexcellent communication\b"],
                 "negative": [r"\bpoor communication\b", r"\bweak communication\b"],
             },
             "preparation": {
-                "positive": [r"\bentrance\b", r"\bprepared\b", r"\bpreparation\b", r"\bhigh score\b"],
+                "positive": [r"\bentrance\b", r"\bprepared\b", r"\bpreparation\b", r"\bhigh score\b", r"\bstem\b", r"\bboard examinations?\b"],
                 "negative": [r"\bunprepared\b", r"\blow entrance\b", r"\bpoor preparation\b"],
             },
         },
@@ -176,19 +176,19 @@ DECISION_CONFIG = {
         },
         "keywords": {
             "experience": {
-                "positive": [r"\bexperience\b", r"\binternship\b", r"\b\d+\s*years?\b", r"\bmultiple years\b"],
+                "positive": [r"\bexperience\b", r"\binternship\b", r"\b\d+\s*years?\b", r"\bmultiple years\b", r"\bhandled\b", r"\bbackend engineering\b"],
                 "negative": [r"\bno experience\b", r"\blimited experience\b"],
             },
             "skills": {
-                "positive": [r"\badvanced\b", r"\bstrong\b", r"\bexcellent\b", r"\bpython\b", r"\bjava\b", r"\breact\b", r"\bnode\b", r"\bsql\b", r"\btechnical\b"],
+                "positive": [r"\badvanced\b", r"\bstrong\b", r"\bexcellent\b", r"\bpython\b", r"\bjava\b", r"\breact\b", r"\bnode\b", r"\bsql\b", r"\btechnical\b", r"\bcloud\b", r"\bproblem-?solving\b", r"\bdebugging\b"],
                 "negative": [r"\bbasic\b", r"\bweak\b", r"\bpoor\b", r"\blimited skills?\b"],
             },
             "projects": {
-                "positive": [r"\bprojects?\b", r"\bmultiple projects?\b", r"\bbuilt\b", r"\bdeployed\b"],
+                "positive": [r"\bprojects?\b", r"\bmultiple projects?\b", r"\bbuilt\b", r"\bdeployed\b", r"\bsaas\b", r"\bapis?\b", r"\bdistributed systems?\b", r"\bplatforms?\b"],
                 "negative": [r"\bno project", r"\blimited projects?\b"],
             },
             "communication": {
-                "positive": [r"\bcommunication\b", r"\bleadership\b", r"\bstrong communication\b"],
+                "positive": [r"\bcommunication\b", r"\bleadership\b", r"\bstrong communication\b", r"\bteamwork\b", r"\bmentoring\b"],
                 "negative": [r"\bpoor communication\b", r"\bweak communication\b"],
             },
             "education": {
@@ -266,12 +266,12 @@ def extractSignals(text, decisionType):
     total_neg = 0
 
     for category, rules in config["keywords"].items():
-        pos = [p for p in rules["positive"] if re.search(p, text_lower)]
-        neg = [n for n in rules["negative"] if re.search(n, text_lower)]
+        pos = sum(len(re.findall(p, text_lower)) for p in rules["positive"])
+        neg = sum(len(re.findall(n, text_lower)) for n in rules["negative"])
         positive_hits[category] = pos
         negative_hits[category] = neg
-        total_pos += len(pos)
-        total_neg += len(neg)
+        total_pos += pos
+        total_neg += neg
 
     return {
         "positive": positive_hits,
@@ -288,11 +288,11 @@ def validateInput(text, decisionType):
     words = re.findall(r"[a-zA-Z0-9%]+", raw)
     unique_words = {w.lower() for w in words}
 
-    if len(raw) < MIN_TEXT_LENGTH:
+    if len(raw) < 40:
         return {"is_valid": False, "reason": "too_short", "signals": [], "signal_count": 0}
-    if len(words) < MIN_WORDS:
+    if len(words) < 12:
         return {"is_valid": False, "reason": "too_few_words", "signals": [], "signal_count": 0}
-    if len(unique_words) < max(5, len(words) // 3):
+    if len(unique_words) < max(6, len(words) // 4):
         return {"is_valid": False, "reason": "low_information_density", "signals": [], "signal_count": 0}
 
     signals = extractSignals(raw, decisionType)
@@ -320,10 +320,10 @@ def calculateScore(signals, decisionType):
     score = 0.0
     factors = []
     for category, weight in config["weights"].items():
-        pos_count = len(signals["positive"].get(category, []))
-        neg_count = len(signals["negative"].get(category, []))
+        pos_count = signals["positive"].get(category, 0)
+        neg_count = signals["negative"].get(category, 0)
 
-        category_strength = 0.42 + (0.33 * pos_count) - (0.28 * neg_count)
+        category_strength = 0.45 + (0.35 * pos_count) - (0.40 * neg_count)
         category_strength = max(0.0, min(1.0, category_strength))
         points = round(weight * category_strength, 2)
         score += points

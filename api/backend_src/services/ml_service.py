@@ -250,7 +250,10 @@ from services.decision_sensitivity import generate_sensitivity_suggestions
 from utils.nlp_parser import runFairAIAnalysis
 
 def run_prediction(model_type: str, raw_payload: dict):
-    raw_text = " ".join([str(v) for v in raw_payload.values()]) if isinstance(raw_payload, dict) else str(raw_payload or "")
+    if isinstance(raw_payload, dict):
+        raw_text = " ".join([f"{k} {v}" for k, v in raw_payload.items()])
+    else:
+        raw_text = str(raw_payload or "")
     analysis = runFairAIAnalysis(raw_text, model_type)
 
     if not analysis["success"]:
